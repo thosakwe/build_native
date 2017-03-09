@@ -48,16 +48,21 @@ class NativeExtensionBuilder implements Builder {
   @override
   Future build(BuildStep buildStep) async {
     var asset = buildStep.inputId;
+    var wDir = new File.fromUri(Directory.current.uri.resolve(asset.path))
+        .parent
+        .absolute
+        .path; // '.'; // p.normalize(p.join(asset.path, '..'));
+    print('Working dir: $wDir');
 
     switch (platformType) {
       case PlatformType.UNIX:
-        await buildUnix(asset);
+        await buildUnix(asset, wDir);
         break;
       case PlatformType.WINDOWS:
-        await buildWindows(asset);
+        await buildWindows(asset, wDir);
         break;
       case PlatformType.MAC:
-        await buildMac(asset);
+        await buildMac(asset, wDir);
         break;
       default:
         throw new UnimplementedError(
@@ -66,21 +71,28 @@ class NativeExtensionBuilder implements Builder {
     }
   }
 
-  buildWindows(AssetId asset) async {}
+  buildWindows(AssetId asset, String wDir) async {}
 
-  buildMac(AssetId asset) async {}
+  buildMac(AssetId asset, String wDir) async {}
 
-  buildUnix(AssetId asset) async {
+  buildUnix(AssetId asset, String wDir) async {
+    var filename = p.basename(asset.path);
+    print('Include path: $includePath');
+
     // Compile object code
     // g++ -fPIC -m32 -I{path to SDK include directory} -DDART_SHARED_LIB -c sample_extension.cc
-    var obj = await Process.run('g++', [
-      '-fPIC',
-      is64Bit ? '-m64' : '-m32',
-      '-I$includePath',
-      '-DDART_SHARED_LIB',
-      '-c',
-      asset.path
-    ]);
+    var obj = await Process.run(
+        'g++',
+        [
+          '-fPIC',
+          is64Bit ? '-m64' : '-m32',
+          '-I',
+          includePath,
+          '-DDART_SHARED_LIB',
+          '-c',
+          filename
+        ],
+        workingDirectory: wDir);
 
     if (obj.exitCode != 0) {
       stderr
@@ -96,15 +108,18 @@ class NativeExtensionBuilder implements Builder {
     // Link extension
     // gcc -shared -m32 -Wl,-soname,libsample_extension.so -o
     // libsample_extension.so sample_extension.o
-    var libPath = 'lib' + asset.changeExtension('.so').path;
-    var link = await Process.run('gcc', [
-      '-shared',
-      '-m32',
-      '-Wl,-soname,$libPath',
-      '-o',
-      '$libPath',
-      asset.path
-    ]);
+    var libPath = 'lib' + p.basename(asset.changeExtension('.so').path);
+    var link = await Process.run(
+        'gcc',
+        [
+          '-shared',
+          '-m32',
+          '-Wl,-soname,$libPath',
+          '-o',
+          '$libPath',
+          p.basename(asset.changeExtension('.o').path)
+        ],
+        workingDirectory: wDir);
 
     if (link.exitCode != 0) {
       stderr

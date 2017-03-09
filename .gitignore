@@ -79,3 +79,6 @@ doc/api/
 pubspec.lock
 
 .scripts-bin/
+
+*.so
+*.o
