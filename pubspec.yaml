@@ -3,6 +3,8 @@ description: "Compile native extensions with package:build."
 homepage: "https://github.com/thosakwe/build_native"
 name: "build_native"
 version: "0.0.0"
+environment:
+  sdk: ">=1.18.0"
 dependencies: 
   build: "^0.7.2"
   path: "^1.4.1"
