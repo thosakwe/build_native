@@ -5,7 +5,11 @@
       <excludeFolder url="file://$MODULE_DIR$/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example/.dart_tool/build/4f23c3a52e262460f3283f2adeb19389/packages" />
+      <excludeFolder url="file://$MODULE_DIR$/example/.dart_tool/build/packages" />
+      <excludeFolder url="file://$MODULE_DIR$/example/.dart_tool/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/example/bin/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/example/lib/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/packages" />
@@ -16,7 +20,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Dart SDK" level="application" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
     <orderEntry type="library" name="Dart Packages" level="project" />
   </component>
 </module>

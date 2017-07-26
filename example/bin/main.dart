@@ -1,9 +1,9 @@
-import 'package:example/sample_extension.dart';
+import '../lib/sample_extension.dart';
 
 main() {
   var num = systemRand();
   print('rand: $num');
 
-  num = systemSrand(2);
-  print('rand(2): $num');
+  var b = systemSrand(2);
+  print('rand(2): $b');
 }
