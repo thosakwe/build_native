@@ -7,7 +7,7 @@ Dart_NativeFunction ResolveName(Dart_Handle name, int argc, bool* auto_setup_sco
 
 // The name of the initialization function is the extension name followed
 // by _Init.
-DART_EXPORT Dart_Handle sample_extension_Init(Dart_Handle parent_library) {
+DART_EXPORT Dart_Handle say_hello_Init(Dart_Handle parent_library) {
   if (Dart_IsError(parent_library)) return parent_library;
 
   Dart_Handle result_code =
@@ -25,7 +25,7 @@ Dart_Handle HandleError(Dart_Handle handle) {
 // Native functions get their arguments in a Dart_NativeArguments structure
 // and return their results with Dart_SetReturnValue.
 void SayHello(Dart_NativeArguments arguments) {
-std::cout << "Hi!" << std::endl;
+std::cout << "Hello, native world!" << std::endl;
   Dart_SetReturnValue(arguments, NULL);
 }
 
