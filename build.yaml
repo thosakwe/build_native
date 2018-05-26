@@ -11,10 +11,13 @@ builders:
     build_extensions:
       .c:
         - .o
+        - .obj
       .cc:
         - .o
+        - .obj
       .cpp:
         - .o
+        - .obj
       .build_native.yaml:
         - .build_native.log
   link:

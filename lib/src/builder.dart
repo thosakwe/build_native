@@ -59,7 +59,7 @@ class NativeExtensionBuilder implements Builder {
         '.build_native.yaml': const ['.build_native.log']
       };
 
-    const List<String> outputs = const ['.o'];
+    const List<String> outputs = const ['.o', '.obj'];
     return {
       '.c': outputs,
       '.cc': outputs,
@@ -129,6 +129,13 @@ class NativeExtensionBuilder implements Builder {
         );
       }
 
+      config = config.copyWith(
+        sources: config.sources
+            .map((s) => s.replaceAll(
+                '!', platform == PlatformType.windows ? '.obj' : '.o'))
+            .toList(),
+      );
+
       switch (platform) {
         case PlatformType.macOS:
           await linkUnix(asset, wDir, config, buildStep, 'clang');
@@ -137,7 +144,7 @@ class NativeExtensionBuilder implements Builder {
           await linkUnix(asset, wDir, config, buildStep, 'gcc');
           break;
         case PlatformType.windows:
-          await linkWindows(asset, wDir, config, buildStep, 'link');
+          await linkWindows(asset, wDir, config, buildStep, 'cl.exe');
           break;
         default:
           throw new UnimplementedError(
@@ -258,7 +265,12 @@ class NativeExtensionBuilder implements Builder {
           .fold(new BytesBuilder(), (b, data) => b..add(data))
           .then((bb) => bb.takeBytes());
       await process.stderr.toList();
-      buildStep.writeAsBytes(asset.changeExtension('.o'), output);
+      buildStep.writeAsBytes(
+          asset.changeExtension(
+              PlatformType.thisSystem(options) == PlatformType.windows
+                  ? '.obj'
+                  : '.o'),
+          output);
     }
   }
 
@@ -324,108 +336,55 @@ class NativeExtensionBuilder implements Builder {
 
   linkWindows(AssetId asset, String wDir, BuildNativeConfig config,
       BuildStep buildStep, String defaultCC) async {
+    var cxx = Platform.environment['CC'] ?? defaultCC;
+    var args = ['-I', includePath, '/DDART_SHARED_LIB'];
     var extensionName =
-        p.basenameWithoutExtension(asset.path).replaceAll('.', '_');
-    var dir = new Directory(wDir);
-    var assetFile = new File.fromUri(dir.uri.resolve(p.basename(asset.path)));
-    var dllMainFile =
-        new File.fromUri(dir.uri.resolve('${extensionName}_dllmain.win.cc'));
-    var objFile = new File.fromUri(dir.uri.resolve('${extensionName}.dll'));
-    await dllMainFile.writeAsString(WindowsBuildOptions.dllMain);
+        p.basenameWithoutExtension(p.basenameWithoutExtension(asset.path));
+    var libname = 'lib' + extensionName + '.dll';
 
-    try {
-      // Compile via CL
-      var cl = await Process.run(Platform.environment['CC'] ?? defaultCC, [
-        '-I',
-        includePath,
-        '/DDART_SHARED_LIB',
-        '/LD',
-        assetFile.absolute.path,
-        dllMainFile.absolute.path,
-        '/link',
-        '/WHOLEARCHIVE:$dartLibPath',
-        '/OUT:${objFile.absolute.path}'
-      ]);
-
-      if (cl.exitCode != 0) {
-        throw 'cl terminated with exit code ${cl.exitCode}: ${cl.stdout}';
-      }
-
-      var built = await objFile.readAsBytes();
-      await objFile.delete();
-      buildStep.writeAsBytes(asset.changeExtension('.dll'), built);
-    } finally {
-      await dllMainFile.delete();
-
-      var garbage = [
-        '$extensionName.exp',
-        '$extensionName.lib',
-        '$extensionName.obj',
-        '${extensionName}_dllmain.win.obj'
-      ];
-      for (var g in garbage) {
-        var f = new File.fromUri(Directory.current.uri.resolve(g));
-        print(f.path);
-        if (await f.exists()) await f.delete();
-      }
-    }
-  }
-
-  linkLinux(AssetId asset, String wDir) async {
-    var filename = p.basename(asset.path);
-
-    // Compile object code
-    // g++ -fPIC -m32 -I{path to SDK include directory} -DDART_SHARED_LIB -c sample_extension.cc
-    var obj = await Process.run(
-        'g++',
-        [
-          '-fPIC',
-          is64Bit ? '-m64' : '-m32',
-          '-I',
-          includePath,
-          '-DDART_SHARED_LIB',
-          '-c',
-          filename
-        ],
-        workingDirectory: wDir);
-
-    if (obj.exitCode != 0) {
-      stderr
-        ..writeln("g++ exited with exit code ${obj.exitCode}.")
-        ..writeln("stdout:")
-        ..writeln(obj.stdout)
-        ..writeln("stderr:")
-        ..writeln(obj.stderr);
-
-      throw new StateError('Could not compile object code from ${asset.path}.');
+    // Compile via CL
+    if (config.sources?.isNotEmpty == true) {
+      args
+        ..add('/LD')
+        ..addAll(config.sources ?? []);
     }
 
-    // Link extension
-    // gcc -shared -m32 -Wl,-soname,libsample_extension.so -o
-    // libsample_extension.so sample_extension.o
-    var libPath = 'lib' + p.basename(asset.changeExtension('.so').path);
-    var link = await Process.run(
-        'gcc',
-        [
-          '-shared',
-          '-m32',
-          '-Wl,-soname,$libPath',
-          '-o',
-          '$libPath',
-          p.basename(asset.changeExtension('.o').path)
-        ],
-        workingDirectory: wDir);
+    config.define?.forEach((key, value) {
+      if (value = null)
+        args.add('-D$key');
+      else
+        args.add('-D$key=$value');
+    });
 
-    if (link.exitCode != 0) {
-      stderr
-        ..writeln("gcc exited with exit code ${link.exitCode}.")
-        ..writeln("stdout:")
-        ..writeln(link.stdout)
-        ..writeln("stderr:")
-        ..writeln(link.stderr);
+    if (Platform.environment['LDFLAGS'] != null)
+      args.addAll(Platform.environment['LDFLAGS']
+          .split(' ')
+          .where((s) => s.isNotEmpty));
+    else
+      args.addAll(config.flags ?? []);
 
-      throw new StateError(
-          'Could not link compiled extension from ${asset.path}.');
+    args.add('/link');
+
+    config.link?.forEach((s) => args.add('-l$s'));
+
+    args.addAll(['/WHOLEARCHIVE:$dartLibPath', '/OUT:$libname']);
+
+    var exec = '$cxx ${args.join(' ')}'.trim();
+    print(exec);
+
+    var process = await Process.start(cxx, args, workingDirectory: wDir);
+    var code = await process.exitCode;
+
+    if (code != 0) {
+      var out = await process.stdout.transform(utf8.decoder).join();
+      var err = await process.stderr.transform(utf8.decoder).join();
+      if (out.isNotEmpty) log.info(out);
+      if (err.isNotEmpty) log.severe(err);
+      log.severe('$exec terminated with exit code $code.');
+      throw '$cxx terminated with exit code ${process.exitCode}.';
     }
+
+    await process.stderr.toList();
+    await process.stdout.toList();
   }
 }

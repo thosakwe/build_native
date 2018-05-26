@@ -11,6 +11,17 @@ Ultimately, to build everything,
 you will just need to run
 `pub run build_runner build`.
 
+The goal of this package is to use *existing*
+infrastructure to build native extensions.
+Eventually, though, it might be nicer to
+perform builds in an `after_install` script in a `pubspec.yaml`.
+
+I've actually [submitted at PR](https://github.com/dart-lang/pub/pull/1908)
+to Pub for such functionality, so instant, portable builds of
+native extensions might be on their way soon.
+
+**NOTE: Windows will soon be supported. But not yet. Beware.**
+
 # Usage
 
 `build_native` requires only very little
@@ -42,11 +53,14 @@ built.
 It should contain a list of source files to
 link together.
 
+The character `!` in a path in `sources` will be replaced
+with `.obj` on Windows, and `.o` everywhere else.
+
 The simplest example:
 
 ```yaml
 sources:
-  - sample_extension.o
+  - sample_extension!
 ```
 
 See `example/` for more.
