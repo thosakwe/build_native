@@ -1,4 +1,6 @@
 # build_native
+[![Pub](https://img.shields.io/pub/v/build_native.svg)](https://pub.dartlang.org/packages/build_native)
+[![License](https://img.shields.io/github/license/thosakwe/build_native.svg)](https://github.com/thosakwe/build_native/blob/master/LICENSE)
 
 Compile native extensions with `package:build`.
 
