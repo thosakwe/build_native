@@ -1,2 +1,3 @@
 sources:
-  - sample_extension!
+  - example|lib/sample_extension.cc
+  - example|lib/dllmain.windows.c

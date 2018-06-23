@@ -1,3 +1,7 @@
+# 0.0.2
+* Use `scratch_space` to deal with temp files.
+* Split into `build_native` and `example`.
+
 # 0.0.1
 * Build individual object files separately.
 * Use a config-based approach to link libraries.

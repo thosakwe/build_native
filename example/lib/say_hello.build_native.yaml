@@ -1,2 +1,2 @@
 sources:
-  - say_hello.o
+  - example|lib/say_hello.cc
