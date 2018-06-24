@@ -2,7 +2,7 @@
 [![Pub](https://img.shields.io/pub/v/build_native.svg)](https://pub.dartlang.org/packages/build_native)
 [![License](https://img.shields.io/github/license/thosakwe/build_native.svg)](https://github.com/thosakwe/build_native/blob/master/LICENSE)
 
-Compile native extensions with `package:build`.
+Compile native extensions with `package:build`, via CMake.
 
 This is a 2-step build process:
 
@@ -21,8 +21,6 @@ perform builds in an `after_install` script in a `pubspec.yaml`.
 I've actually [submitted at PR](https://github.com/dart-lang/pub/pull/1908)
 to Pub for such functionality, so instant, portable builds of
 native extensions might be on their way soon.
-
-**NOTE: Windows will soon be supported. But not yet. Beware.**
 
 # Usage
 
@@ -48,21 +46,20 @@ used to apply platform-specific settings in your build.
 ## Master Build File
 
 To perform linking, include an
-`<extension_name>.build_native.yaml` file
+`lib<extension_name>.build_native.yaml` file
 in the directory where the extension should be
 built.
 
 It should contain a list of source files to
 link together.
 
-The character `!` in a path in `sources` will be replaced
-with `.obj` on Windows, and `.o` everywhere else.
+Note that these should all be asset ID's.
 
-The simplest example:
+The simplest example, `libsample_extension.build_native.yaml`:
 
 ```yaml
 sources:
-  - sample_extension!
+  - example|src/sample_extension.cc
 ```
 
 See `example/` for more.
@@ -72,8 +69,11 @@ All supported options:
 ```yaml
 flags:
   - "-O2"
+sources:
+  - example|sample_extension.cc
+  - example|sample_extension.macos.cc # Will only be included on MacOS; ignored elsewhere
 link:
-  - packages:example/sample_extension!
+  - example|some_lib.o
 define:
   foo: bar
   DEBUG:

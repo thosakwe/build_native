@@ -26,7 +26,6 @@ class CMakeBuilder implements Builder {
         '.build_native.so',
         '.build_native.dylib',
         '.build_native.dll',
-        '.build_native.txt'
       ]
     };
   }
@@ -35,8 +34,13 @@ class CMakeBuilder implements Builder {
   Future build(BuildStep buildStep) async {
     var asset = buildStep.inputId;
     var platform = PlatformType.thisSystem(builderOptions);
-    var projectName = p.basenameWithoutExtension(
-        PlatformType.stripPlatformExtension(asset.path));
+    var projectName = p
+        .basenameWithoutExtension(asset.path)
+        .replaceFirst(new RegExp('^lib'), '');
+    /*var projectName = p
+        .basenameWithoutExtension(
+            PlatformType.stripPlatformExtension(asset.path))
+        .replaceFirst(new RegExp('^lib'), '');*/
     var scratchSpace = await buildStep.fetchResource(scratchSpaceResource);
 
     // Read the configuration file.
@@ -65,10 +69,12 @@ class CMakeBuilder implements Builder {
     var libDir = libFile.parent.absolute.path;
     var cmakeLists = new StringBuffer();
     cmakeLists.writeln('cmake_minimum_required(VERSION 3.0)');
-    cmakeLists.writeln('project($projectName)');
+    //cmakeLists.writeln('project($projectName)');
     //cmakeLists.writeln('set(CMAKE_BINARY_DIR $libDir)');
     cmakeLists.writeln('set(CMAKE_CXX_STANDARD 11)');
+    cmakeLists.writeln('set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "$libDir")');
     cmakeLists.writeln('set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "$libDir")');
+    cmakeLists.writeln('set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "$libDir")');
     cmakeLists.writeln('set(CMAKE_POSITION_INDEPENDENT_CODE ON)');
     //cmakeLists.writeln('set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY $libDir)');
     //cmakeLists.writeln('set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $libDir)');
@@ -124,33 +130,46 @@ class CMakeBuilder implements Builder {
     }
 
     // Tell CMake where to put the library file...
-    cmakeLists.writeln(
-        r'install(TARGETS $projectName DESTINATION ${CMAKE_CURRENT_LIST_DIR})');
+    //cmakeLists.writeln(
+    //    'install(TARGETS $projectName DESTINATION \${CMAKE_CURRENT_LIST_DIR})');
 
     log.info(cmakeLists);
 
     // Generate the text file.
-    var txtAsset = asset.changeExtension('.txt');
-    var txtFile = scratchSpace.fileFor(txtAsset);
-    await txtFile.create(recursive: true);
-    await txtFile.writeAsString(cmakeLists.toString());
-    await scratchSpace.copyOutput(txtAsset, buildStep);
+    //var cmakeAsset = asset.changeExtension('.cmake');
+    //var cmakeFile = scratchSpace.fileFor(cmakeAsset);
+    //await cmakeFile.create(recursive: true);
+    //await cmakeFile.writeAsString(cmakeLists.toString());
+    //await scratchSpace.copyOutput(cmakeAsset, buildStep);
+
+    // Include the generated file.
+
     //await buildStep.writeAsString(txtAsset, cmakeLists.toString());
     //await scratchSpace.ensureAssets([txtAsset], buildStep);
 
     // Next, run CMake...
-    var wDir = txtFile.parent.absolute;
-    var wPath = wDir.path;
-    var args = <String>['--build', wPath, '--target', projectName];
-    var exec = 'cmake .';
+    //var wDir = cmakeFile.parent.absolute;
+    //var wPath = wDir.path;
 
-    var cmakeListsTxtFile =
-        new File.fromUri(wDir.uri.resolve('CMakeLists.txt'));
+    var tmp = Directory.systemTemp.createTempSync();
+    var wPath = tmp.resolveSymbolicLinksSync();
+    var cmakeListsTxtFile = new File.fromUri(tmp.uri.resolve('CMakeLists.txt'));
+    bool exists = await cmakeListsTxtFile.exists();
     await cmakeListsTxtFile.create(recursive: true);
     await cmakeListsTxtFile.writeAsString(cmakeLists.toString());
+    //await cmakeFile.create(recursive: true);
+    //await cmakeFile.writeAsString(cmakeLists.toString());
 
-    Future doProcess(Process process) async {
-      print(exec);
+    var sink = cmakeListsTxtFile.openWrite(mode: FileMode.writeOnlyAppend);
+    if (!exists) sink.writeln('cmake_minimum_required(VERSION 3.0)');
+    //sink.writeln('include ("${cmakeFile.absolute.path}")');
+    await sink.close();
+
+    Future doProcess(String cmd, List<String> args) async {
+      var exec = '$cmd ${args.join(' ')}'.trim();
+      log.warning('Now running `$exec` in $wPath...');
+
+      var process = await Process.start(cmd, args, workingDirectory: wPath);
       var code = await process.exitCode;
 
       if (code != 0) {
@@ -165,18 +184,19 @@ class CMakeBuilder implements Builder {
       }
     }
 
-    var process = await Process.start('cmake', [wPath]);
-    //await Process.start('cmake', ['.'], workingDirectory: wDir.path);
-    await doProcess(process);
-    exec = 'cmake ${args.join(' ')}'.trim();
-    process = await Process.start('cmake', args);
-    await doProcess(process);
+    await doProcess('cmake', ['.']);
+    await doProcess('cmake', ['--build', '.', '--target', projectName]);
+
+    //var genLibFile = new File.fromUri(libFile.parent.uri
+    //   .resolve('lib${projectName}${platform.libraryExtension}'));
+    //await genLibFile.copy(libFile.absolute.path);
 
     //await for (var e in libFile.parent.list(recursive: true)) {
     //  log.info('* ${e.absolute.path}\n');
     //}
 
     scratchSpace.copyOutput(libAsset, buildStep);
+    await tmp.delete(recursive: true);
     //scratchSpace.copyOutput(outAsset, buildStep);
   }
 }

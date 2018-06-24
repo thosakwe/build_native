@@ -9,4 +9,4 @@ builders:
         - .build_native.so
         - .build_native.dylib
         - .build_native.dll
-        - .build_native.txt
+        - .build_native.cmake
