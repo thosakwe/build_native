@@ -29,13 +29,16 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         '/dev/stdout',
         '-I',
         includePath,
-      ])
+      ]);
+
+    // TODO: Add all third-party includes.
+
+    args
       ..addAll(options.compilerFlags)
       ..add(inputFile.absolute.path);
 
     return await execProcess(compiler, args);
   }
-
 
   @override
   Future<Stream<List<int>>> linkLibrary(LibraryLinkOptions options) async {
@@ -70,6 +73,7 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       args.addAll(options.config.flags?.cast<String>() ?? []);
 
     var sources = <AssetId>[];
+
     for (var src in options.config.sources ?? []) {
       var id = AssetId.parse(src.toString());
       var objId = id.changeExtension(options.platformType.objectExtension);
@@ -80,7 +84,8 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     }
 
     if (sources.isEmpty) {
-      throw 'Either the build configuration defined no assets, or none defined were readable.';
+      log.warning(
+          'Either the build configuration defined no assets, or none defined were readable.');
     } else {
       var scratchSpace = await options.scratchSpace;
       await scratchSpace.ensureAssets(sources, options.buildStep);
@@ -88,6 +93,14 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       for (var src in sources) {
         args.add(scratchSpace.fileFor(src).absolute.path);
       }
+    }
+
+    for (var name in options.config.thirdPartyDependencies.keys) {
+      var dep = options.config.thirdPartyDependencies[name];
+      var toLink = options.dependencyManager
+          .assumeDependencyHasAlreadyBeenDownloaded(name, dep)
+          .linkDirectories;
+      args.addAll(toLink.map((d) => '-L${d.absolute.path}'));
     }
 
     options.config.link?.forEach((s) => args.add('-l$s'));

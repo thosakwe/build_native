@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:build/build.dart';
 import 'package:build_native/src/compiler/compiler.dart';
+import 'package:build_native/src/third_party/third_party.dart';
+import 'package:build_native/src/common.dart';
 import 'package:build_native/src/platform_type.dart';
 
 Builder objectFileBuilder(BuilderOptions builderOptions) =>
@@ -37,7 +39,15 @@ class _ObjectFileBuilder implements Builder {
     }
 
     var options = new ObjectFileCompilationOptions(
-        buildStep, buildStep.inputId, builderOptions, platformType);
+      buildStep,
+      buildStep.inputId,
+      builderOptions,
+      platformType,
+      new DependencyManager(
+        buildStep.inputId.package,
+        () => buildStep.fetchResource(scratchSpaceResource),
+      ),
+    );
     var output = await compiler.compileObjectFile(options);
     var outFile =
         options.inputId.changeExtension(options.platformType.objectExtension);

@@ -29,6 +29,8 @@ abstract class _ThirdPartyDependency {
 
   List<String> get include;
 
+  List<String> get link;
+
   List<String> get sources;
 
   bool get isGit => gitUrl?.isNotEmpty == true;

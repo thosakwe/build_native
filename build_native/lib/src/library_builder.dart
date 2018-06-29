@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:build/build.dart';
+import 'package:build_native/src/common.dart';
 import 'package:build_native/src/compiler/compiler.dart';
+import 'package:build_native/src/third_party/third_party.dart';
 import 'package:build_native/src/platform_type.dart';
 import 'package:build_native/src/read_config.dart';
 import 'package:path/path.dart' as p;
@@ -35,7 +37,16 @@ class _LibraryBuilder implements Builder {
     var config = await readConfig(asset, buildStep, platformType);
 
     var options = new LibraryLinkOptions(
-        config, buildStep, buildStep.inputId, builderOptions, platformType);
+      config,
+      buildStep,
+      buildStep.inputId,
+      builderOptions,
+      platformType,
+      new DependencyManager(
+        buildStep.inputId.package,
+        () => buildStep.fetchResource(scratchSpaceResource),
+      ),
+    );
     var output = await compiler.linkLibrary(options);
 
     var outFile = new AssetId(

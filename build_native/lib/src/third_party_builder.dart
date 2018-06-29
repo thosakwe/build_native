@@ -37,7 +37,12 @@ class _ThirdPartyBuilder implements Builder {
     var out = {};
 
     for (var name in deps.keys) {
-      await manager.ensureDependency(name, deps[name]);
+      await manager.ensureDependency(name, deps[name], platformType);
+      out[name] = manager
+          .assumeDependencyHasAlreadyBeenDownloaded(name, deps[name])
+          .directory
+          .absolute
+          .path;
     }
 
     buildStep.writeAsString(

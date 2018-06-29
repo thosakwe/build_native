@@ -10,3 +10,9 @@ third_party:
   readline:
     url: http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
     md5: 205b03a87fc83dab653b628c59b9fc91
+    sources: ["none"] # Can set this to ["none"] to skip running Makefile, etc.
+  symbol_table_cpp:
+    git: https://github.com/thosakwe/symbol_table_cpp.git
+    commit: 44fb7f1
+    link:
+      - . # Link the built libraries in the current directory.

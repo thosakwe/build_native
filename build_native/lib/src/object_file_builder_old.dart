@@ -45,8 +45,8 @@ class ObjectFileBuilder implements Builder {
     }
   }
 
-  Future buildUnix(AssetId asset, ScratchSpace scratchSpace, BuildStep buildStep,
-      String defaultCC, String defaultCXX) async {
+  Future buildUnix(AssetId asset, ScratchSpace scratchSpace,
+      BuildStep buildStep, String defaultCC, String defaultCXX) async {
     var cc = Platform.environment['CC'] ?? defaultCC;
     var cxx = Platform.environment['CXX'] ?? defaultCXX;
     bool isC = p.extension(asset.path) == '.c';

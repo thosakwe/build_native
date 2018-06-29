@@ -18,8 +18,10 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       this.remote,
       this.path,
       List<String> include,
+      List<String> link,
       List<String> sources})
       : this.include = new List.unmodifiable(include ?? []),
+        this.link = new List.unmodifiable(link ?? []),
         this.sources = new List.unmodifiable(sources ?? []);
 
   @override
@@ -53,6 +55,9 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
   final List<String> include;
 
   @override
+  final List<String> link;
+
+  @override
   final List<String> sources;
 
   ThirdPartyDependency copyWith(
@@ -66,6 +71,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       String remote,
       String path,
       List<String> include,
+      List<String> link,
       List<String> sources}) {
     return new ThirdPartyDependency(
         webUrl: webUrl ?? this.webUrl,
@@ -78,6 +84,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         remote: remote ?? this.remote,
         path: path ?? this.path,
         include: include ?? this.include,
+        link: link ?? this.link,
         sources: sources ?? this.sources);
   }
 
@@ -94,6 +101,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         other.path == path &&
         const ListEquality<String>(const DefaultEquality<String>())
             .equals(other.include, include) &&
+        const ListEquality<String>(const DefaultEquality<String>())
+            .equals(other.link, link) &&
         const ListEquality<String>(const DefaultEquality<String>())
             .equals(other.sources, sources);
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:build_native/src/models/models.dart';
+import 'package:build_native/src/platform_type.dart';
 import 'package:path/path.dart' as p;
 import 'package:scratch_space/scratch_space.dart';
 import 'dependency.dart';
@@ -23,8 +24,8 @@ class DependencyManager {
     return new DependencyView(name, dependency, directoryFor(name));
   }
 
-  Future<DependencyView> ensureDependency(
-      String name, ThirdPartyDependency dependency) async {
+  Future<DependencyView> ensureDependency(String name,
+      ThirdPartyDependency dependency, PlatformType platformType) async {
     var dir = directoryFor(name);
     var updater = DependencyUpdater.updaterFor(name, dependency);
     var needsRebuild = false;
@@ -45,10 +46,10 @@ class DependencyManager {
       var view = new DependencyView(name, dependency, dir);
 
       if (needsRebuild) {
-        var externalBuilder = await view.externalBuilder;
+        var externalBuilder = await view.getExternalBuilder(platformType);
 
         if (externalBuilder != null) {
-          // TODO: Support external builds
+          await externalBuilder.build(view.directory, dependency, platformType);
         }
       }
 
