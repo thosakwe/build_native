@@ -18,5 +18,5 @@ abstract class _BuildNativeConfig {
   List<String> get sources;
 
   @Alias('third_party')
-  List<ThirdPartyDependency> get thirdPartyDependencies;
+  Map<String, ThirdPartyDependency> get thirdPartyDependencies;
 }

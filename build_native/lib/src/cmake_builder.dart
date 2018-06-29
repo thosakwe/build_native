@@ -1,3 +1,4 @@
+/*
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -129,7 +130,7 @@ class CMakeBuilder implements Builder {
       cmakeLists.writeln('link_directories("$dartLibPath")');
     }
 
-    for (var link in config.link ?? []) {
+    for (var link in config.link ?? <String>[]) {
       var assetId = AssetId.parse(link);
       await scratchSpace.ensureAssets([assetId], buildStep);
       cmakeLists.write('target_link_libraries($projectName ');
@@ -209,3 +210,4 @@ class CMakeBuilder implements Builder {
     //scratchSpace.copyOutput(outAsset, buildStep);
   }
 }
+*/

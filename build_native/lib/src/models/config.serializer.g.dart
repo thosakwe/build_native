@@ -13,10 +13,13 @@ abstract class BuildNativeConfigSerializer {
         define: map['define'] as Map<String, String>,
         link: map['link'] as List<String>,
         sources: map['sources'] as List<String>,
-        thirdPartyDependencies: map['third_party'] is Iterable
-            ? new List.unmodifiable(((map['third_party'] as Iterable)
-                    .where((x) => x is Map) as Iterable<Map>)
-                .map(ThirdPartyDependencySerializer.fromMap))
+        thirdPartyDependencies: map['third_party'] is Map
+            ? new Map.unmodifiable(
+                (map['third_party'] as Map).keys.fold({}, (out, key) {
+                return out
+                  ..[key] = ThirdPartyDependencySerializer.fromMap(
+                      ((map['third_party'] as Map)[key]) as Map);
+              }))
             : null);
   }
 
@@ -29,9 +32,11 @@ abstract class BuildNativeConfigSerializer {
       'define': model.define,
       'link': model.link,
       'sources': model.sources,
-      'third_party': model.thirdPartyDependencies
-          ?.map(ThirdPartyDependencySerializer.toMap)
-          ?.toList()
+      'third_party': model.thirdPartyDependencies.keys?.fold({}, (map, key) {
+        return map
+          ..[key] = ThirdPartyDependencySerializer.toMap(
+              model.thirdPartyDependencies[key]);
+      })
     };
   }
 }

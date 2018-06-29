@@ -12,7 +12,7 @@ class BuildNativeConfig implements _BuildNativeConfig {
       Map<String, String> this.define,
       List<String> this.link,
       List<String> this.sources,
-      List<ThirdPartyDependency> this.thirdPartyDependencies});
+      Map<String, ThirdPartyDependency> this.thirdPartyDependencies});
 
   @override
   final List<String> flags;
@@ -27,14 +27,14 @@ class BuildNativeConfig implements _BuildNativeConfig {
   final List<String> sources;
 
   @override
-  final List<ThirdPartyDependency> thirdPartyDependencies;
+  final Map<String, ThirdPartyDependency> thirdPartyDependencies;
 
   BuildNativeConfig copyWith(
       {List<String> flags,
       Map<String, String> define,
       List<String> link,
       List<String> sources,
-      List<ThirdPartyDependency> thirdPartyDependencies}) {
+      Map<String, ThirdPartyDependency> thirdPartyDependencies}) {
     return new BuildNativeConfig(
         flags: flags ?? this.flags,
         define: define ?? this.define,
@@ -56,8 +56,9 @@ class BuildNativeConfig implements _BuildNativeConfig {
             .equals(other.link, link) &&
         const ListEquality<String>(const DefaultEquality<String>())
             .equals(other.sources, sources) &&
-        const ListEquality<ThirdPartyDependency>(
-                const DefaultEquality<ThirdPartyDependency>())
+        const MapEquality<String, ThirdPartyDependency>(
+                keys: const DefaultEquality<String>(),
+                values: const DefaultEquality<ThirdPartyDependency>())
             .equals(other.thirdPartyDependencies, thirdPartyDependencies);
   }
 

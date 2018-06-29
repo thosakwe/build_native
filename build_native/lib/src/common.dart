@@ -14,7 +14,7 @@ String get dartLibPath => p.absolute(p.join(getSdkPath(), 'bin', 'dart.lib'));
 final Resource<ScratchSpace> scratchSpaceResource =
     new Resource(() => new ScratchSpace(), dispose: (old) => old.delete());
 
-Future<Stream<List>> execProcess(
+Future<Stream<List<int>>> execProcess(
     String executable, List<String> arguments) async {
   var exec = '$executable ';
   exec += arguments.join(' ');
