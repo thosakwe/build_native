@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
+import 'package:build/build.dart';
 import 'package:build_native/src/models/third_party.dart';
+import 'package:build_native/src/common.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
@@ -28,6 +30,10 @@ class WebDependencyUpdater implements DependencyUpdater {
       ThirdPartyDependency dependency,
       Directory directory,
       Future<ScratchSpace> Function() getScratchSpace) async {
+    if (isFresh) {
+      await isOutdated(dependency, directory);
+    }
+
     var file = archiveNameFile(directory);
     var archiveFilename = await file.openRead().transform(utf8.decoder).join();
     var archiveFile = new File(
@@ -36,11 +42,11 @@ class WebDependencyUpdater implements DependencyUpdater {
     // Compare the hash, if necessary.
     if (dependency.md5 != null) {
       var bytes = await archiveFile.readAsBytes();
-      var md5Hash = hex.encode(md5.convert(bytes).bytes);
+      var checksum = hex.encode(md5.convert(bytes).bytes);
 
-      if (md5Hash != dependency.md5) {
-        throw 'The hash $md5Hash of ${archiveFile.absolute
-            .path} does not equal "${dependency.md5}".';
+      if (checksum != dependency.md5) {
+        throw 'The checksum $checksum of ${archiveFile.absolute
+            .path} does not equal ${dependency.md5}.';
       }
     }
 
@@ -74,9 +80,22 @@ class WebDependencyUpdater implements DependencyUpdater {
     }
 
     // Now that we've decoded the archive, let's extract it.
-    Future copyAllFiles(String currentDir, Iterable<ArchiveFile> files) async {}
+    for (var file in archive.files.where((f) => f.isFile)) {
+      var fn = file.name;
 
-    await copyAllFiles('.', archive);
+      if (p.dirname(fn) != '.') {
+        fn = p.joinAll(p.split(fn).skip(1));
+      }
+
+      var ioFile = new File(p.join(directory.path, fn));
+      await ioFile.create(recursive: true);
+      await ioFile.writeAsBytes(file.content as List<int>);
+
+      if (!Platform.isWindows) {
+        await expectExitCode0(
+            'chmod', [file.mode.toRadixString(8), ioFile.absolute.path]);
+      }
+    }
   }
 
   static int handleFailureStatusCode(HttpClientResponse response, String url) {
@@ -97,6 +116,7 @@ class WebDependencyUpdater implements DependencyUpdater {
 
     try {
       if (!await file.exists()) {
+        log.fine('Freshly downloading ${dependency.webUrl}...');
         var rq = await client.openUrl('GET', Uri.parse(dependency.webUrl));
         rq.headers.set('accept', '*/*');
 
@@ -113,6 +133,9 @@ class WebDependencyUpdater implements DependencyUpdater {
           p.basename(dependency.webUrl),
         ));
 
+        await file.create(recursive: true);
+        file.writeAsString(p.basename(archiveFile.path));
+
         await archiveFile.create(recursive: true);
         await rs.pipe(archiveFile.openWrite());
         return true;
@@ -126,6 +149,7 @@ class WebDependencyUpdater implements DependencyUpdater {
         // Ideally, the file is untouched, and the server returns a 304.
         var stat = await archiveFile.stat();
 
+        log.fine('Seeing if we need to re-download ${dependency.webUrl}...');
         var rq = await client.openUrl('GET', Uri.parse(dependency.webUrl));
         rq.headers
           ..set('accept', '*/*')

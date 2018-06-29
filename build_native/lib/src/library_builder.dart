@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:build/build.dart';
 import 'package:build_native/src/compiler/compiler.dart';
-import 'package:build_native/src/models/models.dart';
 import 'package:build_native/src/platform_type.dart';
 import 'package:build_native/src/read_config.dart';
 import 'package:path/path.dart' as p;
-import 'package:yaml/yaml.dart' as yaml;
 
 Builder libraryBuilder(BuilderOptions builderOptions) =>
     new _LibraryBuilder(builderOptions);
