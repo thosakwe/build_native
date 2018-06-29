@@ -21,6 +21,10 @@ abstract class _ThirdPartyDependency {
 
   String get tag;
 
+  String get target;
+
+  String get remote;
+
   String get path;
 
   List<String> get include;
@@ -28,4 +32,8 @@ abstract class _ThirdPartyDependency {
   List<String> get sources;
 
   bool get isGit => gitUrl?.isNotEmpty == true;
+
+  bool get isWeb => webUrl?.isNotEmpty == true;
+
+  String get formattedTag => tag == null ? null : 'tags/$tag';
 }

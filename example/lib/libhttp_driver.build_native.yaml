@@ -1,0 +1,9 @@
+sources:
+  - example|lib/say_hello.cc
+third_party:
+  http_parser:
+    git: https://github.com/nodejs/http-parser
+    include:
+      - http-parser.h
+    sources:
+      - http-parser.c

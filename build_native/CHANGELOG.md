@@ -1,6 +1,8 @@
 # 0.0.5
 * Update the README, etc. to reflect on the fact that we are no longer
 using CMake.
+* Added the `thirdPartyBuilder`, which enables users to pull
+in external sources.
 
 # 0.0.4
 * Return to using the user's system to build object files. Hooray for incremental builds!

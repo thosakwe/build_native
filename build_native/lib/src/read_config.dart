@@ -118,7 +118,7 @@ Map<String, dynamic> unyamlifyMap(String key, yaml.YamlNode node) {
   if (node == null) {
     return null;
   } else if (node is! yaml.YamlMap) {
-    throw errorWithSpan('$key: expected a list', node.span);
+    throw errorWithSpan('$key: expected a map', node.span);
   } else {
     var map = node as yaml.YamlMap;
     var out = <String, dynamic>{};

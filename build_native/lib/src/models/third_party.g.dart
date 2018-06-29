@@ -14,6 +14,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       this.commit,
       this.branch,
       this.tag,
+      this.target,
+      this.remote,
       this.path,
       List<String> include,
       List<String> sources})
@@ -39,6 +41,12 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
   final String tag;
 
   @override
+  final String target;
+
+  @override
+  final String remote;
+
+  @override
   final String path;
 
   @override
@@ -54,6 +62,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       String commit,
       String branch,
       String tag,
+      String target,
+      String remote,
       String path,
       List<String> include,
       List<String> sources}) {
@@ -64,6 +74,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         commit: commit ?? this.commit,
         branch: branch ?? this.branch,
         tag: tag ?? this.tag,
+        target: target ?? this.target,
+        remote: remote ?? this.remote,
         path: path ?? this.path,
         include: include ?? this.include,
         sources: sources ?? this.sources);
@@ -77,6 +89,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         other.commit == commit &&
         other.branch == branch &&
         other.tag == tag &&
+        other.target == target &&
+        other.remote == remote &&
         other.path == path &&
         const ListEquality<String>(const DefaultEquality<String>())
             .equals(other.include, include) &&

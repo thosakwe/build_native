@@ -14,13 +14,17 @@ String get dartLibPath => p.absolute(p.join(getSdkPath(), 'bin', 'dart.lib'));
 final Resource<ScratchSpace> scratchSpaceResource =
     new Resource(() => new ScratchSpace(), dispose: (old) => old.delete());
 
-Future<Stream<List<int>>> execProcess(
-    String executable, List<String> arguments) async {
+Future<Stream<List<int>>> execProcess(String executable, List<String> arguments,
+    [String workingDirectory, bool withTimeout = true]) async {
   var exec = '$executable ';
   exec += arguments.join(' ');
   exec = exec.trim();
-  var process = await Process.start(executable, arguments);
-  var code = await process.exitCode;
+  if (workingDirectory != null) exec += ' (in $workingDirectory)';
+  var process = await Process.start(executable, arguments,
+      workingDirectory: workingDirectory);
+  var code = await (withTimeout
+      ? avoidHangingProcess(process, exec)
+      : process.exitCode);
 
   if (code != 0) {
     var out = await process.stdout.transform(utf8.decoder).join();
@@ -35,17 +39,65 @@ Future<Stream<List<int>>> execProcess(
   }
 }
 
+Future expectExitCode0(String executable, List<String> arguments,
+    [String workingDirectory, bool withTimeout = true]) {
+  return expectExitCode(
+      executable, arguments, [0], workingDirectory, withTimeout);
+}
+
+void listenToProcess(Process process, [bool withStdout = false]) {
+  if (withStdout) {
+    process.stdout
+        .transform(utf8.decoder)
+        .transform(LineSplitter())
+        .listen(log.info);
+  }
+
+  process.stderr
+      .transform(utf8.decoder)
+      .transform(LineSplitter())
+      .listen(log.severe);
+}
+
+Future<int> avoidHangingProcess(Process process, String exec) {
+  var timeout = const Duration(minutes: 5);
+  return process.exitCode.timeout(timeout, onTimeout: () {
+    process.kill();
+    throw 'The process $exec took too long to complete.';
+  });
+}
+
+Future expectExitCode(
+    String executable, List<String> arguments, List<int> allowedExitCodes,
+    [String workingDirectory, bool withTimeout = true]) async {
+  var exec = '$executable ';
+  exec += arguments.join(' ');
+  exec = exec.trim();
+  if (workingDirectory != null) exec += ' (in $workingDirectory)';
+  var process = await Process.start(executable, arguments,
+      workingDirectory: workingDirectory);
+  log.config(exec);
+  listenToProcess(process, true);
+  var code = await (withTimeout
+      ? avoidHangingProcess(process, exec)
+      : process.exitCode);
+
+  if (!allowedExitCodes.contains(code)) {
+    throw '$exec terminated with exit code $code.';
+  } else {
+    return code;
+  }
+}
+
 Future handleProcess(Process process, String exec, BuildStep buildStep,
     ScratchSpace scratchSpace, AssetId outAsset) async {
-  print(exec);
+  log.config(exec);
+  listenToProcess(process);
   var code = await process.exitCode;
 
   if (code != 0) {
     var out = await process.stdout.transform(utf8.decoder).join();
-    var err = await process.stderr.transform(utf8.decoder).join();
     if (out.isNotEmpty) log.info(out);
-    if (err.isNotEmpty) log.severe(err);
-    log.severe('$exec terminated with exit code $code.');
     throw '$exec terminated with exit code $code.';
   } else {
     await process.stderr.toList();

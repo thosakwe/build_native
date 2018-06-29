@@ -15,6 +15,8 @@ abstract class ThirdPartyDependencySerializer {
         commit: map['commit'] as String,
         branch: map['branch'] as String,
         tag: map['tag'] as String,
+        target: map['target'] as String,
+        remote: map['remote'] as String,
         path: map['path'] as String,
         include: map['include'] as List<String>,
         sources: map['sources'] as List<String>);
@@ -31,6 +33,8 @@ abstract class ThirdPartyDependencySerializer {
       'commit': model.commit,
       'branch': model.branch,
       'tag': model.tag,
+      'target': model.target,
+      'remote': model.remote,
       'path': model.path,
       'include': model.include,
       'sources': model.sources
@@ -50,6 +54,10 @@ abstract class ThirdPartyDependencyFields {
   static const String branch = 'branch';
 
   static const String tag = 'tag';
+
+  static const String target = 'target';
+
+  static const String remote = 'remote';
 
   static const String path = 'path';
 

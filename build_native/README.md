@@ -99,6 +99,25 @@ Platforms available: `macos`, `windows`, `linux`.
 By providing this as the `PLATFORM` environment
 variable, you can override this.
 
+# Third-Party Dependencies
+To require from Git:
+
+```yaml
+third_party:
+  git: https://github.com/nodejs/http-parser.git
+  commit: "some-hash"
+  branch: master
+  tag: some tag
+  path: foo/bar
+  include:
+    - include/foo.h
+  sources:
+    - src/main.c
+    - src/b/c/d.c
+```
+
+*Always* cloned with `--depth 1`.
+
 # Windows
 
 Save yourself a hassle by running the build within the
