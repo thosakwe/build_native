@@ -1,3 +1,12 @@
+# 0.0.4
+* Return to using the user's system to build object files. Hooray for incremental builds!
+* Split out object file-building functionality into a *much* cleaner API.
+
+# 0.0.3
+* Update SDK constraints, dependencies, etc., to ensure the package
+installs!
+* Finalize decision to build to cache.
+
 # 0.0.2
 * Use `scratch_space` to deal with temp files.
 * Split into `build_native` and `example`.

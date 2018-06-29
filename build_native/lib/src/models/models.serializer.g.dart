@@ -3,19 +3,22 @@
 part of 'models.dart';
 
 // **************************************************************************
-// Generator: SerializerGenerator
+// SerializerGenerator
 // **************************************************************************
 
 abstract class BuildNativeConfigSerializer {
   static BuildNativeConfig fromMap(Map map) {
     return new BuildNativeConfig(
-        flags: map['flags'],
-        define: map['define'],
-        link: map['link'],
-        sources: map['sources']);
+        flags: map['flags'] as List<Object>,
+        define: map['define'] as Map<Object, Object>,
+        link: map['link'] as List<Object>,
+        sources: map['sources'] as List<Object>);
   }
 
   static Map<String, dynamic> toMap(BuildNativeConfig model) {
+    if (model == null) {
+      return null;
+    }
     return {
       'flags': model.flags,
       'define': model.define,

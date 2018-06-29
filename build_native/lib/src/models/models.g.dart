@@ -3,37 +3,33 @@
 part of 'models.dart';
 
 // **************************************************************************
-// Generator: JsonModelGenerator
+// JsonModelGenerator
 // **************************************************************************
 
-class BuildNativeConfig extends _BuildNativeConfig {
-  BuildNativeConfig(
-      {List<String> flags,
-      Map<String, String> define,
-      List<String> link,
-      List<String> sources})
-      : this.flags = new List.unmodifiable(flags ?? []),
-        this.define = new Map.unmodifiable(define ?? {}),
-        this.link = new List.unmodifiable(link ?? []),
-        this.sources = new List.unmodifiable(sources ?? []);
+class BuildNativeConfig implements _BuildNativeConfig {
+  const BuildNativeConfig(
+      {List<Object> this.flags,
+      Map<Object, Object> this.define,
+      List<Object> this.link,
+      List<Object> this.sources});
 
   @override
-  final List<String> flags;
+  final List<Object> flags;
 
   @override
-  final Map<String, String> define;
+  final Map<Object, Object> define;
 
   @override
-  final List<String> link;
+  final List<Object> link;
 
   @override
-  final List<String> sources;
+  final List<Object> sources;
 
   BuildNativeConfig copyWith(
-      {List<String> flags,
-      Map<String, String> define,
-      List<String> link,
-      List<String> sources}) {
+      {List<Object> flags,
+      Map<Object, Object> define,
+      List<Object> link,
+      List<Object> sources}) {
     return new BuildNativeConfig(
         flags: flags ?? this.flags,
         define: define ?? this.define,
@@ -43,15 +39,15 @@ class BuildNativeConfig extends _BuildNativeConfig {
 
   bool operator ==(other) {
     return other is _BuildNativeConfig &&
-        const ListEquality<String>(const DefaultEquality<String>())
+        const ListEquality<Object>(const DefaultEquality<Object>())
             .equals(other.flags, flags) &&
-        const MapEquality<String, String>(
-                keys: const DefaultEquality<String>(),
-                values: const DefaultEquality<String>())
+        const MapEquality<Object, Object>(
+                keys: const DefaultEquality<Object>(),
+                values: const DefaultEquality<Object>())
             .equals(other.define, define) &&
-        const ListEquality<String>(const DefaultEquality<String>())
+        const ListEquality<Object>(const DefaultEquality<Object>())
             .equals(other.link, link) &&
-        const ListEquality<String>(const DefaultEquality<String>())
+        const ListEquality<Object>(const DefaultEquality<Object>())
             .equals(other.sources, sources);
   }
 

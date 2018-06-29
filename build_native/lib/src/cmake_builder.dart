@@ -23,9 +23,9 @@ class CMakeBuilder implements Builder {
       //'.cc': const ['.o'],
       //'.cpp': const ['.o'],
       '.build_native.yaml': const [
-        '.build_native.so',
-        '.build_native.dylib',
-        '.build_native.dll',
+        '.so',
+        '.dylib',
+        '.dll',
       ]
     };
   }
@@ -44,16 +44,17 @@ class CMakeBuilder implements Builder {
     var scratchSpace = await buildStep.fetchResource(scratchSpaceResource);
 
     // Read the configuration file.
-    var config = BuildNativeConfigSerializer
-        .fromMap(yaml.loadYaml(await buildStep.readAsString(asset)));
+    var config = BuildNativeConfigSerializer.fromMap(
+        yaml.loadYaml(await buildStep.readAsString(asset)));
 
     // Try to find platform-specific config.
     var platformSpecificConfigId =
         asset.changeExtension('${platform.name}.build_native.yaml');
 
     if (await buildStep.canRead(platformSpecificConfigId)) {
-      var specific = BuildNativeConfigSerializer.fromMap(yaml
-          .loadYaml(await buildStep.readAsString(platformSpecificConfigId)));
+      var loadedYaml =
+          yaml.loadYaml(await buildStep.readAsString(platformSpecificConfigId));
+      var specific = BuildNativeConfigSerializer.fromMap(loadedYaml);
       config = config.copyWith(
         define: new Map.from(config.define ?? {})
           ..addAll(specific.define ?? {}),
@@ -64,7 +65,12 @@ class CMakeBuilder implements Builder {
       );
     }
 
-    var libAsset = asset.changeExtension(platform.libraryExtension);
+    var libAsset = new AssetId(
+      asset.package,
+      p.setExtension(
+          p.basenameWithoutExtension(asset.path), platform.libraryExtension),
+    );
+    //var libAsset =  asset.changeExtension(platform.libraryExtension);
     var libFile = scratchSpace.fileFor(libAsset);
     var libDir = libFile.parent.absolute.path;
     var cmakeLists = new StringBuffer();
@@ -87,18 +93,21 @@ class CMakeBuilder implements Builder {
     // Add compiler definitions, flags
     cmakeLists.writeln('add_definitions(-DDART_SHARED_LIB=1)');
 
-    config.define.forEach((k, v) {
-      if (v?.isNotEmpty == true) {
+    config.define?.forEach((k, v) {
+      if (v?.toString()?.isNotEmpty == true) {
         cmakeLists.writeln('add_definitions("-D$k=$v")');
       } else {
         cmakeLists.writeln('add_definitions("-D$k")');
       }
     });
 
-    cmakeLists.writeln(
-        'set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} ${config.flags.join(' ')}")');
-    for (var flag in config.flags)
-      cmakeLists.writeln('add_definitions("$flag")');
+    if (config.flags?.isNotEmpty == true) {
+      cmakeLists.writeln(
+          'set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} ${config.flags.join(
+              ' ')}")');
+      for (var flag in config.flags)
+        cmakeLists.writeln('add_definitions("$flag")');
+    }
 
     // Add include directories
     cmakeLists.writeln('include_directories("$includePath")');
@@ -106,7 +115,7 @@ class CMakeBuilder implements Builder {
     // Add sources
     cmakeLists.writeln('add_library($projectName SHARED');
 
-    for (var source in config.sources) {
+    for (var source in config.sources ?? []) {
       var assetId = new AssetId.parse(source);
       await scratchSpace.ensureAssets([assetId], buildStep);
       cmakeLists
@@ -120,7 +129,7 @@ class CMakeBuilder implements Builder {
       cmakeLists.writeln('link_directories("$dartLibPath")');
     }
 
-    for (var link in config.link) {
+    for (var link in config.link ?? []) {
       var assetId = AssetId.parse(link);
       await scratchSpace.ensureAssets([assetId], buildStep);
       cmakeLists.write('target_link_libraries($projectName ');

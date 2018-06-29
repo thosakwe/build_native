@@ -1,113 +1,49 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:build/build.dart';
-import 'package:path/path.dart' as p;
-import 'package:scratch_space/scratch_space.dart';
-import 'platform_type.dart';
-import 'common.dart';
+import 'package:build_native/src/compiler/compiler.dart';
+import 'package:build_native/src/platform_type.dart';
 
-Builder objectFileBuilder(BuilderOptions buildOptions) =>
-    new ObjectFileBuilder(buildOptions);
+Builder objectFileBuilder(BuilderOptions builderOptions) =>
+    new _ObjectFileBuilder(builderOptions);
 
-class ObjectFileBuilder implements Builder {
-  static const List<String> outputs = const ['.o', '.obj'];
+class _ObjectFileBuilder implements Builder {
+  final BuilderOptions builderOptions;
 
-  final BuilderOptions buildOptions;
-
-  const ObjectFileBuilder(this.buildOptions);
+  _ObjectFileBuilder(this.builderOptions);
 
   @override
   Map<String, List<String>> get buildExtensions {
-    return const {
-      '.c': outputs,
-      '.cc': outputs,
-      '.cpp': outputs,
+    return {
+      '.c': ['.o', '.obj'],
+      '.cc': ['.o', '.obj'],
+      '.cpp': ['.o', '.obj'],
     };
   }
 
   @override
   Future build(BuildStep buildStep) async {
-    var asset = buildStep.inputId;
-    var platform = PlatformType.thisSystem(buildOptions);
-    if (!platform.canCompile(asset.path)) return null;
+    var platformType = PlatformType.thisSystem(builderOptions);
+    var compiler = nativeExtensionCompilers[platformType];
 
-    var scratchSpace = await buildStep.fetchResource(scratchSpaceResource);
-    await scratchSpace.ensureAssets([asset], buildStep);
-
-    switch (platform) {
-      case PlatformType.windows:
-        return await buildWindows(asset, scratchSpace, buildStep);
-      case PlatformType.macOS:
-      case PlatformType.linux:
-        return await buildUnix(asset, scratchSpace, buildStep, 'gcc', 'g++');
-      default:
-        throw 'Unsupported platform: $platform';
+    if (compiler == null) {
+      throw 'Cannot compile object files on platform `${platformType
+          .name}` yet.';
     }
-  }
 
-  Future buildUnix(AssetId asset, ScratchSpace scratchSpace, BuildStep buildStep,
-      String defaultCC, String defaultCXX) async {
-    var cc = Platform.environment['CC'] ?? defaultCC;
-    var cxx = Platform.environment['CXX'] ?? defaultCXX;
-    bool isC = p.extension(asset.path) == '.c';
-    var compiler = isC ? cc : cxx;
-    var flags =
-        isC ? Platform.environment['CFLAGS'] : Platform.environment['CXXFLAGS'];
-    var args = <String>[];
-    var outAsset = asset.changeExtension('.o');
-    var outFile = scratchSpace.fileFor(outAsset);
+    // Only compile platform-specific files if they apply to the current platform.
+    if (!platformType.canCompile(buildStep.inputId.path)) {
+      return null;
+    }
 
-    args.addAll([
-      '-c',
-      '-o',
-      outFile.absolute.path,
-      '-I',
-      includePath,
-    ]);
-
-    if (flags != null) args.addAll(flags.split(' ').where((s) => s.isNotEmpty));
-
-    args.addAll([
-      //p.setExtension(basename, '.o'),
-      //p.basename(asset.path),
-      scratchSpace.fileFor(asset).absolute.path,
-    ]);
-
-    var exec = '$compiler ${args.join(' ')}'.trim();
-    var process = await Process.start(compiler, args);
-    await handleProcess(process, exec, buildStep, scratchSpace, outAsset);
-  }
-
-  Future buildWindows(
-      AssetId asset, ScratchSpace scratchSpace, BuildStep buildStep) async {
-    var cc = Platform.environment['CC'] ?? 'cl';
-    var cxx = Platform.environment['CXX'] ?? 'cl';
-    bool isC = p.extension(asset.path) == '.c';
-    var compiler = isC ? cc : cxx;
-    var flags =
-        isC ? Platform.environment['CFLAGS'] : Platform.environment['CXXFLAGS'];
-    var args = <String>[];
-    var outAsset = asset.changeExtension('.o');
-    var outFile = scratchSpace.fileFor(outAsset);
-
-    args.addAll([
-      '-c',
-      '-o',
-      outFile.absolute.path,
-      '-I',
-      includePath,
-    ]);
-
-    if (flags != null) args.addAll(flags.split(' ').where((s) => s.isNotEmpty));
-
-    args.addAll([
-      //p.setExtension(basename, '.o'),
-      //p.basename(asset.path),
-      scratchSpace.fileFor(asset).absolute.path,
-    ]);
-
-    var exec = '$compiler ${args.join(' ')}'.trim();
-    var process = await Process.start(compiler, args);
-    await handleProcess(process, exec, buildStep, scratchSpace, outAsset);
+    var options = new ObjectFileCompilationOptions(
+        buildStep, buildStep.inputId, builderOptions, platformType);
+    var output = await compiler.compileObjectFile(options);
+    var outFile =
+        options.inputId.changeExtension(options.platformType.objectExtension);
+    var bytes = await output
+        .fold<BytesBuilder>(BytesBuilder(), (bb, buf) => bb..add(buf))
+        .then((bb) => bb.takeBytes());
+    await options.buildStep.writeAsBytes(outFile, bytes);
   }
 }

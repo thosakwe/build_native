@@ -11,16 +11,21 @@ This is a 2-step build process:
 
 Ultimately, to build everything,
 you will just need to run
-`pub run build_runner build`.
+`pub run build_runner build --output=build/vm`.
 
 The goal of this package is to use *existing*
 infrastructure to build native extensions.
-Eventually, though, it might be nicer to
-perform builds in an `after_install` script in a `pubspec.yaml`.
 
-I've actually [submitted at PR](https://github.com/dart-lang/pub/pull/1908)
-to Pub for such functionality, so instant, portable builds of
-native extensions might be on their way soon.
+**Note that at the time of this writing, it is NECESSARY
+to provide an `--output` argument to the `build_runner` command;
+otherwise, native extensions cannot be resolved to their correct
+paths.**
+
+**As an added note, Windows building is not supported *YET*.**
+
+**As yet another note, this has not been tested on Linux,
+but it is developed on Mac, and the two platforms compile extensions
+almost exactly the same way.**
 
 # Usage
 
