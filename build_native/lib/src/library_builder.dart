@@ -7,12 +7,14 @@ import 'package:build_native/src/third_party/third_party.dart';
 import 'package:build_native/src/platform_type.dart';
 import 'package:build_native/src/read_config.dart';
 import 'package:path/path.dart' as p;
+import 'object_file_builder.dart';
 
 Builder libraryBuilder(BuilderOptions builderOptions) =>
     new _LibraryBuilder(builderOptions);
 
 class _LibraryBuilder implements Builder {
   final BuilderOptions builderOptions;
+  ObjectFileBuilder _objectFileBuilder;
 
   _LibraryBuilder(this.builderOptions);
 
@@ -36,7 +38,15 @@ class _LibraryBuilder implements Builder {
 
     var config = await readConfig(asset, buildStep, platformType);
 
-    var options = new LibraryLinkOptions(
+    // Compile all sources first.
+    _objectFileBuilder ??= new ObjectFileBuilder(builderOptions, config);
+
+    for (var src in config.sources) {
+      var id = AssetId.parse(src);
+      await _objectFileBuilder.build(id, buildStep);
+    }
+
+    var options = new NativeCompilationOptions(
       config,
       buildStep,
       buildStep.inputId,

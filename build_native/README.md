@@ -4,6 +4,24 @@
 
 Compile native extensions with `package:build`, using the system compilers.
 
+* [About](#about)
+* [Usage](#usage)
+    * [Source Files](#source-files)
+    * [Master Build File](#master-build-file)
+* [Platform-specific Options](#platform-specific-options)
+* [Third-Party Dependencies](#third-party-dependencies)
+    * [Specifying a Subdirectory](#specifying-a-subdirectory)
+    * [External Build Systems](#external-build-systems)
+        * [Disabling Automatic Builds](#disabling-automatic-builds)
+    * [From the Web](#from-the-web)
+    * [From Git](#from-git)
+* [Windows](#windows)
+* [Unix](#unix)
+
+**Windows building is not supported *YET*.**
+
+# About
+
 This is a 2-step build process:
 
 1.  Build `*.{c,cc,cpp}` files to `.o`.
@@ -21,9 +39,7 @@ to provide an `--output` argument to the `build_runner` command;
 otherwise, native extensions cannot be resolved to their correct
 paths.**
 
-**As an added note, Windows building is not supported *YET*.**
-
-**As yet another note, this has not been tested on Linux,
+**As an added note, this has not been tested on Linux,
 but it is developed on Mac, and the two platforms compile extensions
 almost exactly the same way.**
 
@@ -100,20 +116,81 @@ By providing this as the `PLATFORM` environment
 variable, you can override this.
 
 # Third-Party Dependencies
+Unless you are a maniac and actually intend to write
+by hand every line of C/C++ code by hand, you might eventually need to pull in
+some source code from the Internet, so that it can be built alongside your program.
+Specify the names of dependencies in the `third_party` section of your configuration:
+
+```yaml
+third_party:
+  git: git://some/repo/here
+  link:
+    - lib # Directories to link against; relative paths.
+  include:
+    - include  # Directories to include from; relative paths.
+  sources: # Source files to compile; CURRENTLY DOES NOTHING.
+    - src/main.c
+    - src/b/c/d.c
+```
+
+## Specifying a Subdirectory
+You can optionally specify a subdirectory against which to search for
+[external build systems](#external-build-systems), include directories, source files,
+and the like:
+
+```yaml
+third_party:
+    curl:
+      path: src/some/dir/where/everything/really/is
+```
+
+## External Build Systems
+`package:build_native` can automatically detect configuration and build external
+projects based on the following files:
+* `CMakeLists.txt` - if present, triggers a CMake build on the system.
+* `Makefile` - if present, triggers a GNU `make` build (`nmake` on Windows).
+* `configure` - if present, it is executed via `sh`, followed by a `make` build (`nmake` on Windows).
+
+*Note: If your aim is cross-platform builds, I personally recommend using CMake. Opting for GNU Make
+can easily shut out Windows users, which many libraries might not want. (Think `node-gyp`, which has
+abysmal support for Windows.)*
+
+### Disabling Automatic Builds
+In the case that you *don't* want to automatically to auto-detect build configuration in an
+external project, make sure you pass a `sources` array to its configuration.
+
+**Note: You can pass `["none"]`, and no sources will be built, as well as disabling auto-build.**
+
+## From the Web
+To require an archive from the Internet:
+
+```yaml
+third_party:
+  curl:
+    # All of these formats are supported:
+    url: https://curl.haxx.se/download/curl-7.60.0.zip
+    url: https://curl.haxx.se/download/curl-7.60.0.tar
+    url: https://curl.haxx.se/download/curl-7.60.0.tar.gz
+    url: https://curl.haxx.se/download/curl-7.60.0.tar.bz2
+    md5: "some-hash-here" # Recommended if distributing on Pub, for security reasons.
+```
+
+## From Git
 To require from Git:
 
 ```yaml
 third_party:
-  git: https://github.com/nodejs/http-parser.git
-  commit: "some-hash"
-  branch: master
-  tag: some tag
-  path: foo/bar
-  include:
-    - include/foo.h
-  sources:
-    - src/main.c
-    - src/b/c/d.c
+  http_parser:
+      git: https://github.com/nodejs/http-parser.git
+      commit: "some-hash"
+      branch: master
+      tag: some tag
+      path: foo/bar
+      include:
+        - include
+      sources:
+        - src/main.c
+        - src/b/c/d.c
 ```
 
 *Always* cloned with `--depth 1`.

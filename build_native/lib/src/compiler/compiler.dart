@@ -19,27 +19,13 @@ abstract class NativeExtensionCompiler {
   static bool isCpp(String path) =>
       p.extension(path) == '.cc' || p.extension(path) == '.cpp';
 
-  Future<Stream<List<int>>> compileObjectFile(
-      ObjectFileCompilationOptions options);
+  Future<Stream<List<int>>> compileObjectFile(NativeCompilationOptions options);
 
-  Future<Stream<List<int>>> linkLibrary(LibraryLinkOptions options);
+  Future<Stream<List<int>>> linkLibrary(NativeCompilationOptions options);
 }
 
-class LibraryLinkOptions extends ObjectFileCompilationOptions {
+class NativeCompilationOptions {
   final BuildNativeConfig config;
-
-  LibraryLinkOptions(
-      this.config,
-      BuildStep buildStep,
-      AssetId inputId,
-      BuilderOptions builderOptions,
-      PlatformType platformType,
-      DependencyManager dependencyManager)
-      : super(buildStep, inputId, builderOptions, platformType,
-            dependencyManager);
-}
-
-class ObjectFileCompilationOptions {
   final BuildStep buildStep;
   final AssetId inputId;
   final BuilderOptions builderOptions;
@@ -64,6 +50,6 @@ class ObjectFileCompilationOptions {
   Future<ScratchSpace> get scratchSpace =>
       buildStep.fetchResource(scratchSpaceResource);
 
-  ObjectFileCompilationOptions(this.buildStep, this.inputId,
+  NativeCompilationOptions(this.config, this.buildStep, this.inputId,
       this.builderOptions, this.platformType, this.dependencyManager);
 }

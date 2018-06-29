@@ -17,6 +17,11 @@ class ExternalMakefileBuilder implements ExternalBuilder {
       args.add(dependency.target);
     }
 
-    return expectExitCode0('make', args, directory.absolute.path, false);
+    return expectExitCode0(
+      platformType == PlatformType.windows ? 'nmake' : 'make',
+      args,
+      directory.absolute.path,
+      false,
+    );
   }
 }

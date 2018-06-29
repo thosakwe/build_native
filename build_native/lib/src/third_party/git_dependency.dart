@@ -51,7 +51,7 @@ class GitDependencyUpdater implements DependencyUpdater {
 
       // Pull the current branch.
       await expectExitCode0(
-          'git', ['pull', '--force', remote, branch], directory.absolute.path);
+          'git', ['pull', '--force', '--all'], directory.absolute.path);
     }
   }
 

@@ -3,6 +3,7 @@
 using CMake.
 * Added the `thirdPartyBuilder`, which enables users to pull
 in external sources.
+* Enabled includes and linking against third_party dependencies.
 
 # 0.0.4
 * Return to using the user's system to build object files. Hooray for incremental builds!

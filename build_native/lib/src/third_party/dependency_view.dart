@@ -42,13 +42,13 @@ class DependencyView {
           log.config('Found configure script: ${configureFile.absolute.path}');
           return const ConfigureScriptBuilder();
         }
+      }
 
-        var makeFile = new File(p.join(directory.path, 'Makefile'));
+      var makeFile = new File(p.join(directory.path, 'Makefile'));
 
-        if (await makeFile.exists()) {
-          log.config('Found Makefile: ${makeFile.absolute.path}');
-          return const ExternalMakefileBuilder();
-        }
+      if (await makeFile.exists()) {
+        log.config('Found Makefile: ${makeFile.absolute.path}');
+        return const ExternalMakefileBuilder();
       }
 
       return null;

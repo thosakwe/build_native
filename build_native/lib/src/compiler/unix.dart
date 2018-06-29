@@ -15,7 +15,7 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
 
   @override
   Future<Stream<List<int>>> compileObjectFile(
-      ObjectFileCompilationOptions options) async {
+      NativeCompilationOptions options) async {
     var compiler = options.getCompilerName(defaultCC, defaultCXX);
     var args = <String>[];
     var scratchSpace = await options.scratchSpace;
@@ -31,7 +31,14 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         includePath,
       ]);
 
-    // TODO: Add all third-party includes.
+    for (var name
+        in options.config.thirdPartyDependencies?.keys ?? <String>[]) {
+      var dep = options.config.thirdPartyDependencies[name];
+      var toLink = options.dependencyManager
+          .assumeDependencyHasAlreadyBeenDownloaded(name, dep)
+          .includeDirectories;
+      args.addAll(toLink.map((d) => '-I${d.absolute.path}'));
+    }
 
     args
       ..addAll(options.compilerFlags)
@@ -41,7 +48,8 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
   }
 
   @override
-  Future<Stream<List<int>>> linkLibrary(LibraryLinkOptions options) async {
+  Future<Stream<List<int>>> linkLibrary(
+      NativeCompilationOptions options) async {
     var cc = options.getCompilerName(defaultCC, defaultCXX);
 
     var args = ['-shared', '-DDART_SHARED_LIB', '-o', '/dev/stdout'];
@@ -76,10 +84,13 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
 
     for (var src in options.config.sources ?? []) {
       var id = AssetId.parse(src.toString());
-      var objId = id.changeExtension(options.platformType.objectExtension);
 
-      if (await options.buildStep.canRead(objId)) {
+      if (options.platformType.canCompile(id.path)) {
+        var objId = id.changeExtension(options.platformType.objectExtension);
+
+        //if (await options.buildStep.canRead(objId)) {
         sources.add(objId);
+        //}
       }
     }
 
@@ -88,14 +99,15 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
           'Either the build configuration defined no assets, or none defined were readable.');
     } else {
       var scratchSpace = await options.scratchSpace;
-      await scratchSpace.ensureAssets(sources, options.buildStep);
+      //await scratchSpace.ensureAssets(sources, options.buildStep);
 
       for (var src in sources) {
         args.add(scratchSpace.fileFor(src).absolute.path);
       }
     }
 
-    for (var name in options.config.thirdPartyDependencies.keys) {
+    for (var name
+        in options.config.thirdPartyDependencies?.keys ?? <String>[]) {
       var dep = options.config.thirdPartyDependencies[name];
       var toLink = options.dependencyManager
           .assumeDependencyHasAlreadyBeenDownloaded(name, dep)
