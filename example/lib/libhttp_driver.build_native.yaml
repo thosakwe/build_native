@@ -7,3 +7,5 @@ third_party:
       - http-parser.h
     sources:
       - http-parser.c
+  mpfr:
+    url: https://www.mpfr.org/mpfr-current/mpfr-4.0.1.tar.bz2
