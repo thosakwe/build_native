@@ -25,8 +25,8 @@ Dart_Handle HandleError(Dart_Handle handle) {
 // Native functions get their arguments in a Dart_NativeArguments structure
 // and return their results with Dart_SetReturnValue.
 void SayHello(Dart_NativeArguments arguments) {
-std::cout << "Hello, native world!" << std::endl;
-  Dart_SetReturnValue(arguments, NULL);
+  std::cout << "Hello, native world!" << std::endl;
+  Dart_SetReturnValue(arguments, Dart_Null());
 }
 
 Dart_NativeFunction ResolveName(Dart_Handle name, int argc, bool* auto_setup_scope) {

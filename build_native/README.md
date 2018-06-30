@@ -27,17 +27,12 @@ This is a 2-step build process:
 1.  Build `*.{c,cc,cpp}` files to `.o`.
 2.  Link files into a shared library.
 
-Ultimately, to build everything,
+Ultimately, to build everything and run a Dart script,
 you will just need to run
-`pub run build_runner build --output=build/vm`.
+`pub run build_runner run <script name>`.
 
 The goal of this package is to use *existing*
 infrastructure to build native extensions.
-
-**Note that at the time of this writing, it is NECESSARY
-to provide an `--output` argument to the `build_runner` command;
-otherwise, native extensions cannot be resolved to their correct
-paths.**
 
 **As an added note, this has not been tested on Linux,
 but it is developed on Mac, and the two platforms compile extensions

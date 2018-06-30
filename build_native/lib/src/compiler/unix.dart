@@ -55,16 +55,18 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     var cc = options.getCompilerName(defaultCC, defaultCXX);
 
     var args = ['-shared', '-DDART_SHARED_LIB', '-o', '/dev/stdout'];
-    //var basename =
-    //    p.basenameWithoutExtension(p.basenameWithoutExtension(asset.path));
 
     if (options.platformType == PlatformType.linux) {
-      args.addAll([
-        //'-Wl,-soname,$libname',
-        '-fPIC',
-        SysInfo.userSpaceBitness == 64 ? '-m64' : '-m32'
-      ]);
-    } else if (options.platformType == PlatformType.macOS) {
+      var libname =
+          PlatformType.basenameWithoutAnyExtension(options.inputId.path);
+      args.add('-Wl,-soname,$libname');
+    } else {
+      args.add('-Wl');
+    }
+
+    args.addAll(['-fPIC', SysInfo.userSpaceBitness == 64 ? '-m64' : '-m32']);
+
+    if (options.platformType == PlatformType.macOS) {
       args.addAll(['-undefined', 'dynamic_lookup']);
     }
 

@@ -69,7 +69,7 @@ class _ThirdPartyBuilder implements Builder {
         try {
           await compiler.compileDependency(dep, options);
         } catch (_) {
-          //await dep.delete();
+          await dep.delete();
           rethrow;
         }
       }

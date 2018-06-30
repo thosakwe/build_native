@@ -35,7 +35,7 @@ class PlatformType {
           .operatingSystem}';
   }
 
-  static String basename(String path) {
+  static String basenameWithoutAnyExtension(String path) {
     return p.basenameWithoutExtension(stripPlatformExtension(path));
   }
 
