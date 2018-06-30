@@ -17,6 +17,7 @@ dependencies:
   front_end: ^0.1.2
   path: ^1.0.0
   scratch_space: ^0.0.3
+  source_span: ^1.0.0
   system_info: ^0.0.6
   quiver: ^0.29.0
   yaml: ^2.0.0
