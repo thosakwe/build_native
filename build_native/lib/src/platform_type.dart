@@ -24,11 +24,17 @@ class PlatformType {
         Platform.environment['PLATFORM'] ?? builderOptions.config['platform'];
     if (_thisSystem != null)
       return _thisSystem;
-    else if (Platform.isWindows || configPlatform == 'windows')
+    else if (configPlatform == 'windows')
       return _thisSystem = windows;
-    else if (Platform.isMacOS || configPlatform == 'macos')
+    else if (configPlatform == 'macos')
       return _thisSystem = macOS;
-    else if (Platform.isLinux || configPlatform == 'linux')
+    else if (configPlatform == 'linux')
+      return _thisSystem = linux;
+    else if (Platform.isWindows)
+      return _thisSystem = windows;
+    else if (Platform.isMacOS)
+      return _thisSystem = macOS;
+    else if (Platform.isLinux)
       return _thisSystem = linux;
     else
       throw 'Could not detect platform type for operating system: ${Platform

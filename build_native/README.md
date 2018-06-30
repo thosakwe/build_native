@@ -6,9 +6,12 @@ Compile native extensions with `package:build`, using the system compilers.
 
 * [About](#about)
 * [Usage](#usage)
+    * [Command-line Usage](#command-line-usage)
+        * [Generating Extension Boilerplate](#generating-extension-boilerplate)
     * [Source Files](#source-files)
     * [Master Build File](#master-build-file)
 * [Platform-specific Options](#platform-specific-options)
+    * [Disallowing a Platform](#disallowing-a-platform)
 * [Third-Party Dependencies](#third-party-dependencies)
     * [Specifying a Subdirectory](#specifying-a-subdirectory)
     * [External Build Systems](#external-build-systems)
@@ -44,6 +47,24 @@ almost exactly the same way.**
 configuration. However, this means that it
 can only serve one purpose:
 invoking the compiler on the user's system.
+
+## Command Line Usage
+`package:build_native` ships with a few commands that can make the native
+extension experience a bit easier to bear:
+
+## Verifying the Environment
+To ensure that the system has a compatible compiler available, and that the necessary
+executables are in the `PATH` to build extensions, run:
+
+`pub run build_native doctor`
+
+### Generating Extension Boilerplate
+Creating native extensions for any language can tend to involve a
+lot of boilerplate.
+
+To quickly scaffold a new native extension, run:
+
+`pub run build_native scaffold`
 
 ## Source Files
 
