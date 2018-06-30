@@ -14,7 +14,7 @@ class ConfigureScriptBuilder implements ExternalBuilder {
       PlatformType platformType) async {
     await expectExitCode0(
       'sh',
-      ['./configure'],// '--prefix=${directory.absolute.path}'],
+      ['./configure'], // '--prefix=${directory.absolute.path}'],
       directory.absolute.path,
       false,
     );

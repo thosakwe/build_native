@@ -23,7 +23,8 @@ abstract class NativeExtensionCompiler {
 
   Future<Stream<List<int>>> linkLibrary(NativeCompilationOptions options);
 
-  Future compileDependency(DependencyView dependency, NativeCompilationOptions options);
+  Future compileDependency(
+      DependencyView dependency, NativeCompilationOptions options);
 }
 
 class NativeCompilationOptions {
