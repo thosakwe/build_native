@@ -27,6 +27,7 @@ class _LibraryBuilder implements Builder {
 
   @override
   Future build(BuildStep buildStep) async {
+    if (PlatformType.isPlatformSpecific(buildStep.inputId.path)) return;
     var asset = buildStep.inputId;
     var platformType = PlatformType.thisSystem(builderOptions);
     var compiler = nativeExtensionCompilers[platformType];

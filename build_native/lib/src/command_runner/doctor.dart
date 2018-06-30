@@ -38,7 +38,7 @@ class DoctorCommand extends Command {
   }
 
   void printNotFound(String executable) =>
-      printInfo(green, '\u2717', executable, 'Not installed');
+      printInfo(red, '\u2717', executable, 'Not installed');
 
   void printVersion(String executable, String version) =>
       printInfo(green, '\u2713', executable, version);
@@ -49,8 +49,8 @@ class DoctorCommand extends Command {
     print(cyan.wrap('Detected platform type - `${platformType.name}`'));
     print(cyan.wrap('Checking build environment...\n'));
 
-    print(yellow.wrap('System `PATH` variable: ${Platform.environment['PATH']}\n'));
-
+    print(yellow
+        .wrap('System `PATH` variable: ${Platform.environment['PATH']}\n'));
 
     // Check for Pub
     try {

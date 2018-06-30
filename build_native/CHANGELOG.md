@@ -1,3 +1,13 @@
+# 0.0.7+2
+* `thirdPartyBuilder` and `libraryBuilder` should only access the
+*master* build file.
+
+# 0.0.7+1
+* Errors in `doctor` should print in `red`!
+
+# 0.0.7
+* Added command-line utilities, for an easier experience.
+
 # 0.0.6
 * Allow third-party libraries with `sources` to build their own
 static libraries.

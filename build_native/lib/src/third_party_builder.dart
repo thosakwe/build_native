@@ -25,6 +25,7 @@ class _ThirdPartyBuilder implements Builder {
 
   @override
   Future build(BuildStep buildStep) async {
+    if (PlatformType.isPlatformSpecific(buildStep.inputId.path)) return;
     var platformType = PlatformType.thisSystem(builderOptions);
     var manager = new DependencyManager(
       buildStep.inputId.package,

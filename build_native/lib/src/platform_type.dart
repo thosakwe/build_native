@@ -41,6 +41,14 @@ class PlatformType {
           .operatingSystem}';
   }
 
+  static bool isPlatformSpecific(String path) {
+    return const [
+      '.macos.build_native.yaml',
+      '.linux.build_native.yaml',
+      '.windows.build_native.yaml',
+    ].any(path.endsWith);
+  }
+
   static String basenameWithoutAnyExtension(String path) {
     return p.basenameWithoutExtension(stripPlatformExtension(path));
   }
