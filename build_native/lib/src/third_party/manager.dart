@@ -21,7 +21,7 @@ class DependencyManager {
 
   DependencyView assumeDependencyHasAlreadyBeenDownloaded(
       String name, ThirdPartyDependency dependency) {
-    return new DependencyView(name, dependency, directoryFor(name));
+    return new DependencyView(name, dependency, directoryFor(name), false);
   }
 
   Future<DependencyView> ensureDependency(String name,
@@ -43,7 +43,7 @@ class DependencyManager {
         }
       }
 
-      var view = new DependencyView(name, dependency, dir);
+      var view = new DependencyView(name, dependency, dir, needsRebuild);
 
       if (needsRebuild) {
         var externalBuilder = await view.getExternalBuilder(platformType);

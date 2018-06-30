@@ -3,4 +3,7 @@ publish_to: none
 dev_dependencies:
   build_native:
     path: ../build_native
-  build_runner: ^0.8.0
+  build_runner:
+      git:
+        url: https://github.com/thosakwe/build.git
+        path: build_runner

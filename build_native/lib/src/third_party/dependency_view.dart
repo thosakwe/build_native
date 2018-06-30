@@ -13,8 +13,10 @@ class DependencyView {
   final String name;
   final ThirdPartyDependency dependency;
   final Directory _directory;
+  final bool wasJustUpdated;
 
-  DependencyView(this.name, this.dependency, this._directory);
+  DependencyView(
+      this.name, this.dependency, this._directory, this.wasJustUpdated);
 
   Directory get directory {
     if (dependency.path?.isNotEmpty == true) {
@@ -22,6 +24,11 @@ class DependencyView {
     } else {
       return _directory;
     }
+  }
+
+  File getLibraryFile(PlatformType platformType) {
+    return new File(p.setExtension(p.join(directory.path, 'lib' + name),
+        platformType.staticLibraryExtension));
   }
 
   Future<ExternalBuilder> getExternalBuilder(PlatformType platformType) async {
@@ -60,7 +67,7 @@ class DependencyView {
       return [];
     } else {
       return dependency.link
-          .map((s) => new Directory(p.join(directory.path, s)))
+          .map((s) => new Directory(p.canonicalize(p.join(directory.path, s))))
           .toList();
     }
   }
@@ -70,7 +77,7 @@ class DependencyView {
       return [];
     } else {
       return dependency.include
-          .map((s) => new Directory(p.join(directory.path, s)))
+          .map((s) => new Directory(p.canonicalize(p.join(directory.path, s))))
           .toList();
     }
   }
@@ -81,8 +88,13 @@ class DependencyView {
     } else {
       return dependency.sources
           .where((s) => s.trim().toLowerCase() != 'none')
-          .map((s) => new File(p.join(directory.path, s)))
+          .map((s) => new File(p.canonicalize(p.join(directory.path, s))))
           .toList();
     }
+  }
+
+  Future delete() async {
+    log.warning('Deleting ${_directory.absolute.path}...');
+    if (await _directory.exists()) await _directory.delete(recursive: true);
   }
 }

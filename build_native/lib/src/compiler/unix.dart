@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:build/build.dart';
 import 'package:build_native/src/common.dart';
 import 'package:build_native/src/platform_type.dart';
+import 'package:build_native/src/third_party/third_party.dart';
+import 'package:path/path.dart' as p;
 import 'package:system_info/system_info.dart';
 import 'compiler.dart';
 
@@ -109,15 +111,65 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     for (var name
         in options.config.thirdPartyDependencies?.keys ?? <String>[]) {
       var dep = options.config.thirdPartyDependencies[name];
-      var toLink = options.dependencyManager
-          .assumeDependencyHasAlreadyBeenDownloaded(name, dep)
-          .linkDirectories;
+      var view = options.dependencyManager
+          .assumeDependencyHasAlreadyBeenDownloaded(name, dep);
+      var toLink = view.linkDirectories;
       args.addAll(toLink.map((d) => '-L${d.absolute.path}'));
+
+      if (view.sourceFiles.isNotEmpty) {
+        var libraryFile = view.getLibraryFile(options.platformType);
+
+        if (!await libraryFile.exists()) {
+          throw 'Cannot build the extension, as the dependency `$name` failed to build.';
+        }
+
+        args.add(libraryFile.absolute.path);
+      }
     }
 
     options.config.link?.forEach((s) => args.add('-l$s'));
 
     args.addAll(['-o', '/dev/stdout']);
     return await execProcess(cc, args);
+  }
+
+  @override
+  Future compileDependency(
+      DependencyView dependency, NativeCompilationOptions options) async {
+    var cc = options.getCompilerName(defaultCC, defaultCXX);
+    var outputPath =
+        dependency.getLibraryFile(options.platformType).absolute.path;
+    var objectPath =
+        p.setExtension(outputPath, options.platformType.objectExtension);
+    var args = <String>['-c', '-o', outputPath];
+
+    for (var dir in dependency.includeDirectories) {
+      args.add('-I${dir.absolute.path}');
+    }
+
+    for (var src in dependency.sourceFiles) {
+      args.add(src.absolute.path);
+    }
+
+    args.addAll(dependency.linkDirectories.map((d) => '-L${d.absolute.path}'));
+
+    await expectExitCode0(cc, args, dependency.directory.absolute.path, false);
+
+    log.config('Output for dependency "${dependency.name}: $objectPath');
+
+    await expectExitCode(
+      'ar',
+      ['rcs', p.basename(outputPath), p.basename(objectPath)],
+      [0, 1],
+      p.dirname(objectPath),
+      false,
+    );
+
+    var outputFile = new File(outputPath);
+
+    if (!await outputFile.exists()) {
+      throw 'Successuly compiled dependency "${dependency.name}"' +
+          ', but could not link it into a static library.';
+    }
   }
 }

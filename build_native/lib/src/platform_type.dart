@@ -5,16 +5,19 @@ import 'package:path/path.dart' as p;
 class PlatformType {
   static PlatformType _thisSystem;
   static const PlatformType windows =
-      const PlatformType._('windows', '.dll', '.obj');
+      const PlatformType._('windows', '.dll', '.lib', '.obj');
   static const PlatformType macOS =
-      const PlatformType._('macos', '.dylib', '.o');
-  static const PlatformType linux = const PlatformType._('linux', '.so', '.o');
+      const PlatformType._('macos', '.dylib', '.a', '.o');
+  static const PlatformType linux =
+      const PlatformType._('linux', '.so', '.a', '.o');
 
   final String name;
-  final String libraryExtension;
+  final String sharedLibraryExtension;
+  final String staticLibraryExtension;
   final String objectExtension;
 
-  const PlatformType._(this.name, this.libraryExtension, this.objectExtension);
+  const PlatformType._(this.name, this.sharedLibraryExtension,
+      this.staticLibraryExtension, this.objectExtension);
 
   static PlatformType thisSystem(BuilderOptions builderOptions) {
     var configPlatform =

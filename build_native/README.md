@@ -128,7 +128,7 @@ third_party:
     - lib # Directories to link against; relative paths.
   include:
     - include  # Directories to include from; relative paths.
-  sources: # Source files to compile; CURRENTLY DOES NOTHING.
+  sources: # Source files to compile
     - src/main.c
     - src/b/c/d.c
 ```

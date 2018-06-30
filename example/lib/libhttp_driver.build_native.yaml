@@ -4,9 +4,9 @@ third_party:
   http_parser:
     git: https://github.com/nodejs/http-parser
     include:
-      - http-parser.h
+      - http_parser.h
     sources:
-      - http-parser.c
+      - http_parser.c
   readline:
     url: http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
     md5: 205b03a87fc83dab653b628c59b9fc91

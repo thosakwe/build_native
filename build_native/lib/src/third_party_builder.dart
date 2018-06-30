@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:build/build.dart';
+import 'package:build_native/src/compiler/compiler.dart';
 import 'package:build_native/src/models/models.dart';
 import 'package:build_native/src/third_party/third_party.dart';
 import 'package:build_native/src/common.dart';
@@ -35,14 +36,43 @@ class _ThirdPartyBuilder implements Builder {
         config.thirdPartyDependencies ?? <String, ThirdPartyDependency>{};
 
     var out = {};
+    var options = new NativeCompilationOptions(
+      config,
+      buildStep,
+      buildStep.inputId,
+      builderOptions,
+      platformType,
+      new DependencyManager(
+        buildStep.inputId.package,
+        () => buildStep.fetchResource(scratchSpaceResource),
+      ),
+    );
 
     for (var name in deps.keys) {
-      await manager.ensureDependency(name, deps[name], platformType);
+      var dep = await manager.ensureDependency(name, deps[name], platformType);
       out[name] = manager
           .assumeDependencyHasAlreadyBeenDownloaded(name, deps[name])
           .directory
           .absolute
           .path;
+
+      // If we just updated this library, then we should (re)build it.
+      if (dep.wasJustUpdated && dep.sourceFiles.isNotEmpty) {
+        var compiler = nativeExtensionCompilers[platformType];
+
+        if (compiler == null) {
+          throw 'Cannot compile external libraries on platform `${platformType
+              .name}` yet.';
+        }
+
+        log.info('Compiling static library `${dep.name}`...');
+        try {
+          await compiler.compileDependency(dep, options);
+        } catch (_) {
+          //await dep.delete();
+          rethrow;
+        }
+      }
     }
 
     buildStep.writeAsString(

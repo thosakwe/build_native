@@ -67,7 +67,7 @@ class _LibraryBuilder implements Builder {
           p.basenameWithoutExtension(
             p.basenameWithoutExtension(options.inputId.path),
           ),
-          options.platformType.libraryExtension,
+          options.platformType.sharedLibraryExtension,
         ),
       ),
     );

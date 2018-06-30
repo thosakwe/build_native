@@ -56,7 +56,7 @@ void listenToProcess(Process process, [bool withStdout = false]) {
   process.stderr
       .transform(utf8.decoder)
       .transform(LineSplitter())
-      .listen(log.severe);
+      .listen(log.warning);
 }
 
 Future<int> avoidHangingProcess(Process process, String exec) {

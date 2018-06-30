@@ -22,6 +22,8 @@ abstract class NativeExtensionCompiler {
   Future<Stream<List<int>>> compileObjectFile(NativeCompilationOptions options);
 
   Future<Stream<List<int>>> linkLibrary(NativeCompilationOptions options);
+
+  Future compileDependency(DependencyView dependency, NativeCompilationOptions options);
 }
 
 class NativeCompilationOptions {
@@ -35,7 +37,7 @@ class NativeCompilationOptions {
   bool get isCXX => NativeExtensionCompiler.isCpp(inputId.path);
 
   String getCompilerName(String defaultCC, String defaultCXX) {
-    if (!isCXX) {
+    if (p.extension(inputId.path) == '.c') {
       return Platform.environment['CC'] ?? defaultCC;
     }
 
