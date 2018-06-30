@@ -80,7 +80,7 @@ sources:
 
 See `example/` for more.
 
-All supported options:
+The most common of the supported options:
 
 ```yaml
 flags:
@@ -88,8 +88,13 @@ flags:
 sources:
   - example|sample_extension.cc
   - example|sample_extension.macos.cc # Will only be included on MacOS; ignored elsewhere
+include:
+  - some_dir
+  - some_other_package|lib/some_file.h # If passing an asset id, you must use a filename.
 link:
-  - example|some_lib.o
+  - curl
+  - readline
+  - some_other_package|lib/libsome_extension.build_native.yaml
 define:
   foo: bar
   DEBUG:
