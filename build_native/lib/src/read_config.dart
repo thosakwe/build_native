@@ -22,6 +22,11 @@ Future<BuildNativeConfig> readConfig(
   log.config('General config: $configMap');
   var config = BuildNativeConfigSerializer.fromMap(configMap);
 
+  if (config.disallowedPlatforms?.contains(platformType.name) == true) {
+    throw 'This project has explicitly disallowed building on platform "${platformType
+        .name}".';
+  }
+
   // Try to find platform-specific config.
   var platformSpecificConfigId =
       asset.changeExtension('${platformType.name}.build_native.yaml');
@@ -66,7 +71,9 @@ Map<String, dynamic> parseConfigMap(yaml.YamlMap map) {
   ];
   var stringMaps = [BuildNativeConfigFields.define];
   var stringLists = [
+    BuildNativeConfigFields.disallowedPlatforms,
     BuildNativeConfigFields.flags,
+    BuildNativeConfigFields.include,
     BuildNativeConfigFields.link,
     BuildNativeConfigFields.sources
   ];

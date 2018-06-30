@@ -1,3 +1,10 @@
+# 0.0.6
+* Allow third-party libraries with `sources` to build their own
+static libraries.
+* Allow linking against the outputs of other packages.
+* Allow including headers from other packages.
+* Allow projects to explicitly disallow platforms.
+
 # 0.0.5
 * Update the README, etc. to reflect on the fact that we are no longer
 using CMake.

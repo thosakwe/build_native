@@ -13,9 +13,13 @@ abstract class _BuildNativeConfig {
 
   Map<String, String> get define;
 
+  List<String> get include;
+
   List<String> get link;
 
   List<String> get sources;
+
+  List<String> get disallowedPlatforms;
 
   @Alias('third_party')
   Map<String, ThirdPartyDependency> get thirdPartyDependencies;

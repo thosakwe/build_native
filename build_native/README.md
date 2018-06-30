@@ -110,6 +110,17 @@ Platforms available: `macos`, `windows`, `linux`.
 By providing this as the `PLATFORM` environment
 variable, you can override this.
 
+## Disallowing a Platform
+If you know your library will certainly never build on a given system, you can explicitly
+disallow it, instead of forcing users to first download dependencies before a build failure:
+
+```yaml
+disallowed_platforms:
+  - linux
+  - macos
+  - windows
+```
+
 # Third-Party Dependencies
 Unless you are a maniac and actually intend to write
 by hand every line of C/C++ code by hand, you might eventually need to pull in
@@ -145,6 +156,8 @@ projects based on the following files:
 * `CMakeLists.txt` - if present, triggers a CMake build on the system.
 * `Makefile` - if present, triggers a GNU `make` build (`nmake` on Windows).
 * `configure` - if present, it is executed via `sh`, followed by a `make` build (`nmake` on Windows).
+
+You can specify a `target` in your dependency, which will be passed to `make` or `CMake`.
 
 *Note: If your aim is cross-platform builds, I personally recommend using CMake. Opting for GNU Make
 can easily shut out Windows users, which many libraries might not want. (Think `node-gyp`, which has

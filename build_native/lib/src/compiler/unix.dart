@@ -33,6 +33,26 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         includePath,
       ]);
 
+    for (var s in options.config.include ?? <String>[]) {
+      if (p.extension(s) == '.build_native.yaml') {
+        try {
+          var id = AssetId.parse(s);
+
+          if (!await options.buildStep.canRead(id)) {
+            throw 'Attempted to depend on the output of "$s", but it seems to have failed to build.';
+          } else {
+            var scratchSpace = await options.scratchSpace;
+            await scratchSpace.ensureAssets([id], options.buildStep);
+            args.addAll(['-include', scratchSpace.fileFor(id).absolute.path]);
+          }
+        } on FormatException {
+          args.addAll(['-I', s]);
+        }
+      } else {
+        args.add('-l$s');
+      }
+    }
+
     for (var name
         in options.config.thirdPartyDependencies?.keys ?? <String>[]) {
       var dep = options.config.thirdPartyDependencies[name];
@@ -129,7 +149,25 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       }
     }
 
-    options.config.link?.forEach((s) => args.add('-l$s'));
+    for (var s in options.config.link ?? <String>[]) {
+      if (p.extension(s) == '.build_native.yaml') {
+        var id = AssetId.parse(s);
+        var builtAsset = new AssetId(
+            id.package,
+            id.path.replaceAll('.build_native.yaml',
+                options.platformType.sharedLibraryExtension));
+
+        if (!await options.buildStep.canRead(builtAsset)) {
+          throw 'Attempted to depend on the output of "$s", but it seems to have failed to build.';
+        } else {
+          var scratchSpace = await options.scratchSpace;
+          await scratchSpace.ensureAssets([builtAsset], options.buildStep);
+          args.add(scratchSpace.fileFor(builtAsset).absolute.path);
+        }
+      } else {
+        args.add('-l$s');
+      }
+    }
 
     args.addAll(['-o', '/dev/stdout']);
     return await execProcess(cc, args);
