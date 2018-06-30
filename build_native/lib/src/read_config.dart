@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:build_native/src/models/models.dart';
 import 'package:build_native/src/platform_type.dart';
+import 'package:path/path.dart' as p;
 import 'package:source_span/source_span.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
@@ -28,8 +29,15 @@ Future<BuildNativeConfig> readConfig(
   }
 
   // Try to find platform-specific config.
-  var platformSpecificConfigId =
-      asset.changeExtension('${platformType.name}.build_native.yaml');
+  var platformSpecificConfigId = new AssetId(
+    asset.package,
+    p.setExtension(
+      p.withoutExtension(p.withoutExtension(asset.path)),
+      '.${platformType.name}.build_native.yaml',
+    ),
+  );
+  log.config(
+      'Searching for platform-specific config "$platformSpecificConfigId"...');
 
   if (await reader.canRead(platformSpecificConfigId)) {
     var platformNode =
@@ -39,7 +47,7 @@ Future<BuildNativeConfig> readConfig(
       throw errorWithSpan('Configuration must be a map', platformNode.span);
     }
 
-    var platformMap = parseConfigMap(configNode as yaml.YamlMap);
+    var platformMap = parseConfigMap(platformNode as yaml.YamlMap);
     log.config('Config for platform "${platformType.name}": $platformMap');
     var platformConfig = BuildNativeConfigSerializer.fromMap(platformMap);
 

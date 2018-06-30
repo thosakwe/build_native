@@ -20,6 +20,7 @@ Future<Stream<List<int>>> execProcess(String executable, List<String> arguments,
   exec += arguments.join(' ');
   exec = exec.trim();
   if (workingDirectory != null) exec += ' (in $workingDirectory)';
+  log.config(exec);
   var process = await Process.start(executable, arguments,
       workingDirectory: workingDirectory);
   var code = await (withTimeout
@@ -73,10 +74,10 @@ Future expectExitCode(
   var exec = '$executable ';
   exec += arguments.join(' ');
   exec = exec.trim();
+  log.config(exec);
   if (workingDirectory != null) exec += ' (in $workingDirectory)';
   var process = await Process.start(executable, arguments,
       workingDirectory: workingDirectory);
-  log.config(exec);
   listenToProcess(process, true);
   var code = await (withTimeout
       ? avoidHangingProcess(process, exec)

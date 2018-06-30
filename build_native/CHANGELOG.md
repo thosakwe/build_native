@@ -1,3 +1,9 @@
+# 0.0.7+4
+* Log *every* program execution in `[CONFIG]`.
+
+# 0.0.7+3
+* Fix a small bug in how platform-specific options were discovered.
+
 # 0.0.7+2
 * `thirdPartyBuilder` and `libraryBuilder` should only access the
 *master* build file.
