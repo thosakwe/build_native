@@ -222,7 +222,10 @@ third_party:
     url: https://curl.haxx.se/download/curl-7.60.0.tar
     url: https://curl.haxx.se/download/curl-7.60.0.tar.gz
     url: https://curl.haxx.se/download/curl-7.60.0.tar.bz2
+    url: https://curl.haxx.se/download/curl-7.60.0.tar.xz
+    url: https://curl.haxx.se/download/curl-7.60.0.tar.lz
     md5: "some-hash-here" # Recommended if distributing on Pub, for security reasons.
+    sha256: SHA256 hashes are also supported
 ```
 
 ## From Git

@@ -12,6 +12,8 @@ abstract class _ThirdPartyDependency {
 
   String get md5;
 
+  String get sha256;
+
   @Alias('git')
   String get gitUrl;
 

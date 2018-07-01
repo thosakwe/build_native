@@ -7,6 +7,7 @@ import 'package:build_native/src/models/third_party.dart';
 import 'package:build_native/src/common.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:lzma/lzma.dart';
 import 'package:path/path.dart' as p;
 import 'package:scratch_space/scratch_space.dart';
 import 'dependency.dart';
@@ -45,8 +46,18 @@ class WebDependencyUpdater implements DependencyUpdater {
       var checksum = hex.encode(md5.convert(bytes).bytes);
 
       if (checksum != dependency.md5) {
-        throw 'The checksum $checksum of ${archiveFile.absolute
+        throw 'The MD5 checksum $checksum of ${archiveFile.absolute
             .path} does not equal ${dependency.md5}.';
+      }
+    }
+
+    if (dependency.sha256 != null) {
+      var bytes = await archiveFile.readAsBytes();
+      var checksum = hex.encode(sha256.convert(bytes).bytes);
+
+      if (checksum != dependency.sha256) {
+        throw 'The SHA256 checksum $checksum of ${archiveFile.absolute
+            .path} does not equal ${dependency.sha256}.';
       }
     }
 
@@ -56,6 +67,9 @@ class WebDependencyUpdater implements DependencyUpdater {
 
     if (ext == '.gz') {
       stream = stream.transform(gzip.decoder);
+      ext = p.extension(p.basenameWithoutExtension(archiveFile.path));
+    } else if (ext == '.lz' || ext == '.xz') {
+      stream = stream.transform(lzma.decoder);
       ext = p.extension(p.basenameWithoutExtension(archiveFile.path));
     } else if (ext == '.bz2') {
       var bytes = await stream

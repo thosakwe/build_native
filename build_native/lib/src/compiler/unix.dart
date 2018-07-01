@@ -34,6 +34,10 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         includePath,
       ]);
 
+    if (NativeExtensionCompiler.isCpp(inputFile.path)) {
+      args.add('-std=c++11');
+    }
+
     for (var s in options.config.include ?? <String>[]) {
       try {
         var id = AssetId.parse(s);
@@ -264,6 +268,11 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
 
     for (var src in dependency.sourceFiles) {
       args.add(src.absolute.path);
+    }
+
+    if (dependency.sourceFiles
+        .any((inputFile) => NativeExtensionCompiler.isCpp(inputFile.path))) {
+      args.add('-std=c++11');
     }
 
     args.addAll(dependency.linkDirectories.map((d) => '-L${d.absolute.path}'));

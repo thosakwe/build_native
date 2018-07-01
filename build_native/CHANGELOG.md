@@ -1,3 +1,8 @@
+# 0.0.9
+* Use C++ 11 on Unix systems.
+* Support decompression of `.xz` and `.lz` via `package:lzma`.
+* Support SHA256 checksum verification.
+
 # 0.0.8
 * Use `otool` and `install_name_tool` to ensure that output
 libraries on MacOS know where to find dependencies.

@@ -11,6 +11,7 @@ abstract class ThirdPartyDependencySerializer {
     return new ThirdPartyDependency(
         webUrl: map['url'] as String,
         md5: map['md5'] as String,
+        sha256: map['sha256'] as String,
         gitUrl: map['git'] as String,
         commit: map['commit'] as String,
         branch: map['branch'] as String,
@@ -31,6 +32,7 @@ abstract class ThirdPartyDependencySerializer {
     return {
       'url': model.webUrl,
       'md5': model.md5,
+      'sha256': model.sha256,
       'git': model.gitUrl,
       'commit': model.commit,
       'branch': model.branch,
@@ -50,6 +52,8 @@ abstract class ThirdPartyDependencyFields {
   static const String webUrl = 'url';
 
   static const String md5 = 'md5';
+
+  static const String sha256 = 'sha256';
 
   static const String gitUrl = 'git';
 
