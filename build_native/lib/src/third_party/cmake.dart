@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:build_native/src/models/third_party.dart';
 import 'package:build_native/src/common.dart';
 import 'package:build_native/src/platform_type.dart';
+import 'dependency_view.dart';
 import 'external_builder.dart';
 
 class ExternalCMakeBuilder implements ExternalBuilder {
@@ -10,12 +11,12 @@ class ExternalCMakeBuilder implements ExternalBuilder {
 
   @override
   Future build(Directory directory, ThirdPartyDependency dependency,
-      PlatformType platformType) async {
+      DependencyView view, PlatformType platformType) async {
     // Build the cache.
     await expectExitCode0(
       'cmake',
-      ['.'],
-      directory.absolute.path,
+      [directory.absolute.path],
+      view.buildDirectory.absolute.path,
       false,
     );
 
@@ -26,6 +27,7 @@ class ExternalCMakeBuilder implements ExternalBuilder {
       args.addAll(['--', '-j', Platform.numberOfProcessors.toString()]);
     }
 
-    await expectExitCode0('cmake', args, directory.absolute.path, false);
+    await expectExitCode0(
+        'cmake', args, view.buildDirectory.absolute.path, false);
   }
 }

@@ -1,3 +1,7 @@
+# 0.0.9+4
+* Build external dependencies into a separate `third_party_build`
+dir.
+
 # 0.0.9+3
 * `644` => `420` in decimal...
 

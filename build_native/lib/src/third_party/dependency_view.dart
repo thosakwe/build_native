@@ -13,10 +13,11 @@ class DependencyView {
   final String name;
   final ThirdPartyDependency dependency;
   final Directory _directory;
+  final Directory buildDirectory;
   final bool wasJustUpdated;
 
-  DependencyView(
-      this.name, this.dependency, this._directory, this.wasJustUpdated);
+  DependencyView(this.name, this.dependency, this._directory,
+      this.buildDirectory, this.wasJustUpdated);
 
   Directory get directory {
     if (dependency.path?.isNotEmpty == true) {
@@ -27,7 +28,7 @@ class DependencyView {
   }
 
   File getLibraryFile(PlatformType platformType) {
-    return new File(p.setExtension(p.join(directory.path, 'lib' + name),
+    return new File(p.setExtension(p.join(buildDirectory.path, 'lib' + name),
         platformType.staticLibraryExtension));
   }
 
@@ -55,7 +56,7 @@ class DependencyView {
 
       if (await makeFile.exists()) {
         log.config('Found Makefile: ${makeFile.absolute.path}');
-        return const ExternalMakefileBuilder();
+        return const ExternalMakefileBuilder(false);
       }
 
       return null;
@@ -87,7 +88,7 @@ class DependencyView {
       return [];
     } else {
       return dependency.libPaths
-          .map((s) => new File(p.canonicalize(p.join(directory.path, s))))
+          .map((s) => new File(p.canonicalize(p.join(buildDirectory.path, s))))
           .toList();
     }
   }

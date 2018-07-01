@@ -3,14 +3,17 @@ import 'dart:io';
 import 'package:build_native/src/models/third_party.dart';
 import 'package:build_native/src/common.dart';
 import 'package:build_native/src/platform_type.dart';
+import 'dependency_view.dart';
 import 'external_builder.dart';
 
 class ExternalMakefileBuilder implements ExternalBuilder {
-  const ExternalMakefileBuilder();
+  final bool isInBuildDirectory;
+
+  const ExternalMakefileBuilder(this.isInBuildDirectory);
 
   @override
   Future build(Directory directory, ThirdPartyDependency dependency,
-      PlatformType platformType) {
+      DependencyView view, PlatformType platformType) {
     var args = ['-j', Platform.numberOfProcessors.toString()];
 
     if (dependency.target != null) {
@@ -20,7 +23,7 @@ class ExternalMakefileBuilder implements ExternalBuilder {
     return expectExitCode0(
       platformType == PlatformType.windows ? 'nmake' : 'make',
       args,
-      directory.absolute.path,
+      (isInBuildDirectory ? view.buildDirectory : directory).absolute.path,
       false,
     );
   }

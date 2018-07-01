@@ -19,9 +19,16 @@ class DependencyManager {
     return new Directory(p.join(directory.path, '$package.$name'));
   }
 
+  Directory buildDirectoryFor(String name) {
+    var buildDir =
+        p.canonicalize(p.join(directory.path, '..', 'third_party_build'));
+    return new Directory(p.join(buildDir, '$package.$name'));
+  }
+
   DependencyView assumeDependencyHasAlreadyBeenDownloaded(
       String name, ThirdPartyDependency dependency) {
-    return new DependencyView(name, dependency, directoryFor(name), false);
+    return new DependencyView(
+        name, dependency, directoryFor(name), buildDirectoryFor(name), false);
   }
 
   Future<DependencyView> ensureDependency(String name,
@@ -43,13 +50,16 @@ class DependencyManager {
         }
       }
 
-      var view = new DependencyView(name, dependency, dir, needsRebuild);
+      var view = new DependencyView(
+          name, dependency, dir, buildDirectoryFor(name), needsRebuild);
 
       if (needsRebuild) {
         var externalBuilder = await view.getExternalBuilder(platformType);
 
         if (externalBuilder != null) {
-          await externalBuilder.build(view.directory, dependency, platformType);
+          await view.buildDirectory.create(recursive: true);
+          await externalBuilder.build(
+              view.directory, dependency, view, platformType);
         }
       }
 

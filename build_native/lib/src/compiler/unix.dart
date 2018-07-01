@@ -88,9 +88,9 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     args.addAll(['-fPIC', SysInfo.userSpaceBitness == 64 ? '-m64' : '-m32']);
 
     if (options.platformType == PlatformType.macOS) {
-      var asDylib = p.basename(options.inputId.path.replaceAll(
-          new RegExp(r'\.build_native.yaml$'),
-          options.platformType.sharedLibraryExtension));
+//      var asDylib = p.basename(options.inputId.path.replaceAll(
+//          new RegExp(r'\.build_native.yaml$'),
+//          options.platformType.sharedLibraryExtension));
       args.addAll([
 //        '-install_name',
 //        '@rpath/$asDylib',

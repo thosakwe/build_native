@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:build_native/src/models/third_party.dart';
 import 'package:build_native/src/common.dart';
 import 'package:build_native/src/platform_type.dart';
+import 'package:path/path.dart' as p;
+import 'dependency_view.dart';
 import 'external_builder.dart';
 import 'make.dart';
 
@@ -11,15 +13,18 @@ class ConfigureScriptBuilder implements ExternalBuilder {
 
   @override
   Future build(Directory directory, ThirdPartyDependency dependency,
-      PlatformType platformType) async {
+      DependencyView view, PlatformType platformType) async {
+    var configurePath =
+        p.canonicalize(p.join(directory.absolute.path, 'configure'));
+
     await expectExitCode0(
       'sh',
-      ['./configure'], // '--prefix=${directory.absolute.path}'],
-      directory.absolute.path,
+      [configurePath, '--prefix=${view.buildDirectory.absolute.path}'],
+      view.buildDirectory.absolute.path,
       false,
     );
 
-    await const ExternalMakefileBuilder()
-        .build(directory, dependency, platformType);
+    await const ExternalMakefileBuilder(true)
+        .build(directory, dependency, view, platformType);
   }
 }
