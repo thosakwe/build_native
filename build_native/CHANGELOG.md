@@ -1,3 +1,7 @@
+# 0.0.7+5
+* Don't manually `git checkout` if no branch/tag/commit is specified.
+* Change third_party deps from `package|x` -> `package.x`; this seems to appease CMake.
+
 # 0.0.7+4
 * Log *every* program execution in `[CONFIG]`.
 

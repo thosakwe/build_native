@@ -16,7 +16,7 @@ class DependencyManager {
   DependencyManager(this.package, this.getScratchSpace);
 
   Directory directoryFor(String name) {
-    return new Directory(p.join(directory.path, '$package|$name'));
+    return new Directory(p.join(directory.path, '$package.$name'));
   }
 
   DependencyView assumeDependencyHasAlreadyBeenDownloaded(
@@ -55,7 +55,7 @@ class DependencyManager {
 
       return view;
     } catch (_) {
-      if (await dir.exists()) await dir.delete(recursive: true);
+      //if (await dir.exists()) await dir.delete(recursive: true);
       rethrow;
     }
   }

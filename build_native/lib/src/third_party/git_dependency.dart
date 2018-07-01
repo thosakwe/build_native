@@ -44,7 +44,7 @@ class GitDependencyUpdater implements DependencyUpdater {
 
       // Checkout the branch/tag/commit.
       await expectExitCode0(
-          'git', ['checkout', branch, '.'], directory.absolute.path);
+          'git', ['checkout', branch], directory.absolute.path);
     } else {
       // Fetch from the remote.
       await expectExitCode0('git', ['fetch', remote], directory.absolute.path);
