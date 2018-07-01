@@ -1,3 +1,6 @@
+# 0.0.7+6
+* Fix a bug in which third-party includes were not processed.
+
 # 0.0.7+5
 * Don't manually `git checkout` if no branch/tag/commit is specified.
 * Change third_party deps from `package|x` -> `package.x`; this seems to appease CMake.

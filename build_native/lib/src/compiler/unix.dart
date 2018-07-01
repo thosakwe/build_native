@@ -34,22 +34,18 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       ]);
 
     for (var s in options.config.include ?? <String>[]) {
-      if (p.extension(s) == '.build_native.yaml') {
-        try {
-          var id = AssetId.parse(s);
+      try {
+        var id = AssetId.parse(s);
 
-          if (!await options.buildStep.canRead(id)) {
-            throw 'Attempted to depend on the output of "$s", but it seems to have failed to build.';
-          } else {
-            var scratchSpace = await options.scratchSpace;
-            await scratchSpace.ensureAssets([id], options.buildStep);
-            args.addAll(['-include', scratchSpace.fileFor(id).absolute.path]);
-          }
-        } on FormatException {
-          args.addAll(['-I', s]);
+        if (!await options.buildStep.canRead(id)) {
+          throw 'Attempted to depend on the output of "$s", but it seems to have failed to build.';
+        } else {
+          var scratchSpace = await options.scratchSpace;
+          await scratchSpace.ensureAssets([id], options.buildStep);
+          args.addAll(['-include', scratchSpace.fileFor(id).absolute.path]);
         }
-      } else {
-        args.add('-l$s');
+      } on FormatException {
+        args.addAll(['-I', s]);
       }
     }
 
