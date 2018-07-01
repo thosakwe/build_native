@@ -10,6 +10,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
   ThirdPartyDependency(
       {this.webUrl,
       this.md5,
+      this.sha1,
       this.sha256,
       this.gitUrl,
       this.commit,
@@ -32,6 +33,9 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
 
   @override
   final String md5;
+
+  @override
+  final String sha1;
 
   @override
   final String sha256;
@@ -72,6 +76,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
   ThirdPartyDependency copyWith(
       {String webUrl,
       String md5,
+      String sha1,
       String sha256,
       String gitUrl,
       String commit,
@@ -87,6 +92,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
     return new ThirdPartyDependency(
         webUrl: webUrl ?? this.webUrl,
         md5: md5 ?? this.md5,
+        sha1: sha1 ?? this.sha1,
         sha256: sha256 ?? this.sha256,
         gitUrl: gitUrl ?? this.gitUrl,
         commit: commit ?? this.commit,
@@ -105,6 +111,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
     return other is _ThirdPartyDependency &&
         other.webUrl == webUrl &&
         other.md5 == md5 &&
+        other.sha1 == sha1 &&
         other.sha256 == sha256 &&
         other.gitUrl == gitUrl &&
         other.commit == commit &&

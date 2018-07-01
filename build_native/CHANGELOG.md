@@ -1,3 +1,7 @@
+# 0.0.9+2
+* Only `chmod` files without mode `644`.
+* Support SHA1 hashes.
+
 # 0.0.9+1
 * Re-enable builder.
 

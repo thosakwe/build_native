@@ -61,6 +61,16 @@ class WebDependencyUpdater implements DependencyUpdater {
       }
     }
 
+    if (dependency.sha1 != null) {
+      var bytes = await archiveFile.readAsBytes();
+      var checksum = hex.encode(sha1.convert(bytes).bytes);
+
+      if (checksum != dependency.sha1) {
+        throw 'The SHA1 checksum $checksum of ${archiveFile.absolute
+            .path} does not equal ${dependency.sha1}.';
+      }
+    }
+
     var stream = archiveFile.openRead();
     var ext = p.extension(archiveFile.path);
     Archive archive;
@@ -105,7 +115,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       await ioFile.create(recursive: true);
       await ioFile.writeAsBytes(file.content as List<int>);
 
-      if (!Platform.isWindows) {
+      if (!Platform.isWindows && file.mode != 644) {
         await expectExitCode0(
             'chmod', [file.mode.toRadixString(8), ioFile.absolute.path]);
       }
