@@ -1,3 +1,6 @@
+# 0.0.9+3
+* `644` => `420` in decimal...
+
 # 0.0.9+2
 * Only `chmod` files without mode `644`.
 * Support SHA1 hashes.

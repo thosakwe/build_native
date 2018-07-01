@@ -115,7 +115,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       await ioFile.create(recursive: true);
       await ioFile.writeAsBytes(file.content as List<int>);
 
-      if (!Platform.isWindows && file.mode != 644) {
+      if (!Platform.isWindows && file.mode != 420) {
         await expectExitCode0(
             'chmod', [file.mode.toRadixString(8), ioFile.absolute.path]);
       }
