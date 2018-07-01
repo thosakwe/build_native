@@ -1,3 +1,6 @@
+# 0.0.9+1
+* Re-enable builder.
+
 # 0.0.9
 * Use C++ 11 on Unix systems.
 * Support decompression of `.xz` and `.lz` via `package:lzma`.

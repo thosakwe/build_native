@@ -1,29 +1,29 @@
-#builders:
-#  third_party:
+builders:
+  third_party:
+    auto_apply: all_packages
+    import: "package:build_native/build_native.dart"
+    builder_factories:
+      - thirdPartyBuilder
+    runs_before:
+#      - "build_native|object_file"
+      - "build_native|library"
+    build_extensions:
+      .build_native.yaml:
+        - .build_native.third_party.json
+#  object_file:
 #    auto_apply: all_packages
 #    import: "package:build_native/build_native.dart"
 #    builder_factories:
-#      - thirdPartyBuilder
+#      - objectFileBuilder
 #    runs_before:
-##      - "build_native|object_file"
 #      - "build_native|library"
-#    build_extensions:
-#      .build_native.yaml:
-#        - .build_native.third_party.json
-##  object_file:
-##    auto_apply: all_packages
-##    import: "package:build_native/build_native.dart"
-##    builder_factories:
-##      - objectFileBuilder
-##    runs_before:
-##      - "build_native|library"
-##    build_extensions: { '.c': ['.o', '.obj'], '.cc': ['.o', '.obj'], '.cpp': ['.o', '.obj'] }
-#  library:
-#    auto_apply: all_packages
-#    import: "package:build_native/build_native.dart"
-#    builder_factories:
-#      - libraryBuilder
-#    build_extensions: { '.build_native.yaml': ['.so', '.dylib', '.dll'] }
+#    build_extensions: { '.c': ['.o', '.obj'], '.cc': ['.o', '.obj'], '.cpp': ['.o', '.obj'] }
+  library:
+    auto_apply: all_packages
+    import: "package:build_native/build_native.dart"
+    builder_factories:
+      - libraryBuilder
+    build_extensions: { '.build_native.yaml': ['.so', '.dylib', '.dll'] }
 targets:
   _third_party_models:
     sources:
