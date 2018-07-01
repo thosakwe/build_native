@@ -17,10 +17,12 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       this.target,
       this.remote,
       this.path,
+      List<String> libPaths,
       List<String> include,
       List<String> link,
       List<String> sources})
-      : this.include = new List.unmodifiable(include ?? []),
+      : this.libPaths = new List.unmodifiable(libPaths ?? []),
+        this.include = new List.unmodifiable(include ?? []),
         this.link = new List.unmodifiable(link ?? []),
         this.sources = new List.unmodifiable(sources ?? []);
 
@@ -52,6 +54,9 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
   final String path;
 
   @override
+  final List<String> libPaths;
+
+  @override
   final List<String> include;
 
   @override
@@ -70,6 +75,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
       String target,
       String remote,
       String path,
+      List<String> libPaths,
       List<String> include,
       List<String> link,
       List<String> sources}) {
@@ -83,6 +89,7 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         target: target ?? this.target,
         remote: remote ?? this.remote,
         path: path ?? this.path,
+        libPaths: libPaths ?? this.libPaths,
         include: include ?? this.include,
         link: link ?? this.link,
         sources: sources ?? this.sources);
@@ -99,6 +106,8 @@ class ThirdPartyDependency extends _ThirdPartyDependency {
         other.target == target &&
         other.remote == remote &&
         other.path == path &&
+        const ListEquality<String>(const DefaultEquality<String>())
+            .equals(other.libPaths, libPaths) &&
         const ListEquality<String>(const DefaultEquality<String>())
             .equals(other.include, include) &&
         const ListEquality<String>(const DefaultEquality<String>())

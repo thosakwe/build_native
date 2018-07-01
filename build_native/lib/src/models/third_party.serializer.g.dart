@@ -18,6 +18,7 @@ abstract class ThirdPartyDependencySerializer {
         target: map['target'] as String,
         remote: map['remote'] as String,
         path: map['path'] as String,
+        libPaths: map['libraries'] as List<String>,
         include: map['include'] as List<String>,
         link: map['link'] as List<String>,
         sources: map['sources'] as List<String>);
@@ -37,6 +38,7 @@ abstract class ThirdPartyDependencySerializer {
       'target': model.target,
       'remote': model.remote,
       'path': model.path,
+      'libraries': model.libPaths,
       'include': model.include,
       'link': model.link,
       'sources': model.sources
@@ -62,6 +64,8 @@ abstract class ThirdPartyDependencyFields {
   static const String remote = 'remote';
 
   static const String path = 'path';
+
+  static const String libPaths = 'libraries';
 
   static const String include = 'include';
 

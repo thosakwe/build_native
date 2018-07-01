@@ -1,3 +1,7 @@
+# 0.0.8
+* Use `otool` and `install_name_tool` to ensure that output
+libraries on MacOS know where to find dependencies.
+
 # 0.0.7+6
 * Fix a bug in which third-party includes were not processed.
 

@@ -58,7 +58,6 @@ class DoctorCommand extends Command {
       printVersion('pub', pubVersion);
     } catch (_) {
       printNotFound('pub');
-      exitCode = 1;
     }
 
     // Check for pbr
@@ -68,9 +67,9 @@ class DoctorCommand extends Command {
           sourceUrl: pubspecLockFile.uri);
       var pbrVersion = publock['packages']['build_runner']['version'] as String;
       if (pbrVersion?.isNotEmpty != true) throw pbrVersion;
-      printVersion('build_runner', 'version $pbrVersion');
+      printVersion('package:build_runner', 'version $pbrVersion');
     } catch (_) {
-      printNotFound('build_runner');
+      printNotFound('package:build_runner');
     }
 
     // Check for Git
@@ -93,6 +92,20 @@ class DoctorCommand extends Command {
           printVersion('clang', clangVersion);
         } catch (_) {
           printNotFound('clang');
+        }
+
+        try {
+          var otoolVersion = await query('otool', ['--version']);
+          printVersion('otool', otoolVersion);
+        } catch (_) {
+          printNotFound('otool');
+        }
+
+        try {
+          await query('install_name_tool', ['--version']);
+          printVersion('install_name_tool', 'Found in `PATH`');
+        } catch (_) {
+          printNotFound('install_name_tool');
         }
       } else {
         try {

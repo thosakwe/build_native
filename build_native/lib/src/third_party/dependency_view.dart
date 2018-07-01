@@ -82,6 +82,16 @@ class DependencyView {
     }
   }
 
+  List<File> get libPathFiles {
+    if (dependency.libPaths?.isNotEmpty != true) {
+      return [];
+    } else {
+      return dependency.libPaths
+          .map((s) => new File(p.canonicalize(p.join(directory.path, s))))
+          .toList();
+    }
+  }
+
   List<File> get sourceFiles {
     if (dependency.sources?.isNotEmpty != true) {
       return [];

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:build/build.dart';
 import 'package:build_native/src/common.dart';
@@ -70,7 +71,7 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       NativeCompilationOptions options) async {
     var cc = options.getCompilerName(defaultCC, defaultCXX);
 
-    var args = ['-shared', '-DDART_SHARED_LIB', '-o', '/dev/stdout'];
+    var args = ['-shared', '-DDART_SHARED_LIB'];
 
     if (options.platformType == PlatformType.linux) {
       var libname =
@@ -83,7 +84,19 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     args.addAll(['-fPIC', SysInfo.userSpaceBitness == 64 ? '-m64' : '-m32']);
 
     if (options.platformType == PlatformType.macOS) {
-      args.addAll(['-undefined', 'dynamic_lookup']);
+      var asDylib = p.basename(options.inputId.path.replaceAll(
+          new RegExp(r'\.build_native.yaml$'),
+          options.platformType.sharedLibraryExtension));
+      args.addAll([
+//        '-install_name',
+//        '@rpath/$asDylib',
+//        '@rpath/$asDylib',
+//        '-Wl,-rpath,.',
+//        '-Wl,-rpath,"\$ORIGIN"',
+        '-undefined',
+        'dynamic_lookup',
+        //'-rpath',
+      ]);
     }
 
     options.config.define?.forEach((key, value) {
@@ -126,6 +139,8 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       }
     }
 
+    var externalSharedLibs = <String, String>{};
+
     for (var name
         in options.config.thirdPartyDependencies?.keys ?? <String>[]) {
       var dep = options.config.thirdPartyDependencies[name];
@@ -142,6 +157,16 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         }
 
         args.add(libraryFile.absolute.path);
+        externalSharedLibs[p.basename(libraryFile.path)] =
+            libraryFile.absolute.path;
+      }
+
+      if (view.libPathFiles.isNotEmpty) {
+        for (var file in view.libPathFiles) {
+          if (await file.exists()) {
+            externalSharedLibs[p.basename(file.path)] = file.absolute.path;
+          }
+        }
       }
     }
 
@@ -158,7 +183,10 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         } else {
           var scratchSpace = await options.scratchSpace;
           await scratchSpace.ensureAssets([builtAsset], options.buildStep);
-          args.add(scratchSpace.fileFor(builtAsset).absolute.path);
+          var builtFile = scratchSpace.fileFor(builtAsset);
+          args.add(builtFile.absolute.path);
+          externalSharedLibs[p.basename(builtFile.path)] =
+              builtFile.absolute.path;
         }
       } else {
         args.add('-l$s');
@@ -166,7 +194,58 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     }
 
     args.addAll(['-o', '/dev/stdout']);
-    return await execProcess(cc, args);
+    var output = await execProcess(cc, args);
+
+    log.config('External shared libs: $externalSharedLibs');
+
+    if (options.platformType != PlatformType.macOS ||
+        externalSharedLibs.isEmpty) {
+      return output;
+    } else {
+      // Overwrite @rpath -> @loader_path
+      var scratchSpace = await options.scratchSpace;
+      var outFile = scratchSpace.fileFor(options.inputId
+          .changeExtension(options.platformType.sharedLibraryExtension));
+      log.config('Writing temp library file ${outFile.absolute.path}...');
+      await outFile.create(recursive: true);
+      await output.pipe(outFile.openWrite());
+
+      // Change @rpath to include third_party
+      //await execProcess('install_name_tool', ['-L', outFile.absolute.path]);
+
+      try {
+        var otool = await execProcess('otool', ['-L', outFile.absolute.path]);
+        var lines = otool.transform(utf8.decoder).transform(LineSplitter());
+
+        await for (var line in lines) {
+          var rgx = new RegExp(r'@rpath.*\.dylib');
+          var m = rgx.firstMatch(line);
+
+          if (m != null) {
+            var absolutePath = externalSharedLibs[p.basename(m[0])];
+
+            if (absolutePath == null) {
+              log.config(
+                  'Not substituting dynamic dependency on ${m[0]} with an absolute path');
+            } else {
+              await expectExitCode0('install_name_tool', [
+                //'-change',
+                //m[0],
+                //absolutePath,
+                //m[0].replaceAll('@rpath', '@loader_path'),
+                '-add_rpath',
+                p.dirname(absolutePath),
+                outFile.absolute.path
+              ]);
+            }
+          }
+        }
+      } catch (e) {
+        log.warning(e);
+      }
+
+      return outFile.openRead();
+    }
   }
 
   @override

@@ -15,6 +15,7 @@ Compile native extensions with `package:build`, using the system compilers.
 * [Third-Party Dependencies](#third-party-dependencies)
     * [Specifying a Subdirectory](#specifying-a-subdirectory)
     * [External Build Systems](#external-build-systems)
+        * [Explicitly Linking a File](#explicitly-linking-a-file)
         * [Disabling Automatic Builds](#disabling-automatic-builds)
     * [From the Web](#from-the-web)
     * [From Git](#from-git)
@@ -188,6 +189,21 @@ You can specify a `target` in your dependency, which will be passed to `make` or
 *Note: If your aim is cross-platform builds, I personally recommend using CMake. Opting for GNU Make
 can easily shut out Windows users, which many libraries might not want. (Think `node-gyp`, which has
 abysmal support for Windows.)*
+
+### Explicitly Linking a File
+In some cases, especially when using an external build system,
+a dependency might emit a shared library; in such a case, the OS needs to know where to find it.
+`package:build_native` is not able to discern this automatically, so specify the names of any
+possible dynamic libraries the external build might create:
+
+```yaml
+mysql_connector:
+    git: ...
+    libraries:
+      - libmysqlcppconnector8.1.dylib
+      - libmysqlcppconnector8.1.so
+      - libmysqlcppconnector8.1.dll
+```
 
 ### Disabling Automatic Builds
 In the case that you *don't* want to automatically to auto-detect build configuration in an

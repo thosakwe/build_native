@@ -27,6 +27,9 @@ abstract class _ThirdPartyDependency {
 
   String get path;
 
+  @Alias('libraries')
+  List<String> get libPaths;
+
   List<String> get include;
 
   List<String> get link;
