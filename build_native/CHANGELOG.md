@@ -1,3 +1,6 @@
+# 0.0.9+8
+* Don't build shared libraries to `/dev/stdout`, but to a file instead.
+
 # 0.0.9+7
 * Allow malformed UTF8 sequences.
 

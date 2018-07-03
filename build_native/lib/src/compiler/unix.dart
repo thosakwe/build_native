@@ -198,22 +198,22 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       }
     }
 
-    args.addAll(['-o', '/dev/stdout']);
-    var output = await execProcess(cc, args);
+    var scratchSpace = await options.scratchSpace;
+    var outFile = scratchSpace.fileFor(options.inputId
+        .changeExtension(options.platformType.sharedLibraryExtension));
+    args.addAll(['-o', outFile.absolute.path]);
+    await expectExitCode0(cc, args);
 
     log.config('External shared libs: $externalSharedLibs');
 
     if (options.platformType != PlatformType.macOS ||
         externalSharedLibs.isEmpty) {
-      return output;
+      return outFile.openRead();
     } else {
       // Overwrite @rpath -> @loader_path
-      var scratchSpace = await options.scratchSpace;
-      var outFile = scratchSpace.fileFor(options.inputId
-          .changeExtension(options.platformType.sharedLibraryExtension));
-      log.config('Writing temp library file ${outFile.absolute.path}...');
-      await outFile.create(recursive: true);
-      await output.pipe(outFile.openWrite());
+      //log.config('Writing temp library file ${outFile.absolute.path}...');
+      //await outFile.create(recursive: true);
+      //await output.pipe(outFile.openWrite());
 
       // Change @rpath to include third_party
       //await execProcess('install_name_tool', ['-L', outFile.absolute.path]);
