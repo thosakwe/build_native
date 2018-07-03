@@ -1,3 +1,7 @@
+# 0.0.9+6
+* Patch a bug in how 3rd-party dependencies with `sources` were
+compiled.
+
 # 0.0.9+5
 * Support `autoconf`, and check for it in `doctor`.
 * Check for `cmake`.

@@ -261,7 +261,10 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         dependency.getLibraryFile(options.platformType).absolute.path;
     var objectPath =
         p.setExtension(outputPath, options.platformType.objectExtension);
-    var args = <String>['-c', '-o', outputPath];
+    var args = <String>['-c', '-o', objectPath];
+
+    var objectDir = new Directory(p.dirname(objectPath));
+    await objectDir.create(recursive: true);
 
     for (var dir in dependency.includeDirectories) {
       args.add('-I${dir.absolute.path}');
