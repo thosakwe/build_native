@@ -169,6 +169,7 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
         for (var file in view.libPathFiles) {
           if (await file.exists()) {
             externalSharedLibs[p.basename(file.path)] = file.absolute.path;
+            args.add('-L' + p.dirname(file.absolute.path));
           }
         }
       }

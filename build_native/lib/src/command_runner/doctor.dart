@@ -74,10 +74,18 @@ class DoctorCommand extends Command {
 
     // Check for Git
     try {
-      var gitVersion = await query('git', ['version']);
+      var gitVersion = await query('git', ['--version']);
       printVersion('git', gitVersion);
     } catch (_) {
       printNotFound('git');
+    }
+
+    // Check for CMake
+    try {
+      var cmakeVersion = await query('cmake', ['--version']);
+      printVersion('cmake', cmakeVersion);
+    } catch (_) {
+      printNotFound('cmake');
     }
 
     if (platformType == PlatformType.windows) {
@@ -85,7 +93,6 @@ class DoctorCommand extends Command {
       //throw new UnimplementedError('The `doctor` command does not yet completely support Windows.');
     } else {
       // Check for `gcc`/clang
-
       if (platformType == PlatformType.macOS) {
         try {
           var clangVersion = await query('clang', ['--version']);
@@ -121,6 +128,14 @@ class DoctorCommand extends Command {
         } catch (_) {
           printNotFound('g++');
         }
+      }
+
+      // Check for Autoconf
+      try {
+        var autoconfVersion = await query('autoconf', ['--version']);
+        printVersion('autoconf', autoconfVersion);
+      } catch (_) {
+        printNotFound('autoconf');
       }
 
       // Check for Make

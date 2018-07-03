@@ -183,6 +183,8 @@ projects based on the following files:
 * `CMakeLists.txt` - if present, triggers a CMake build on the system.
 * `Makefile` - if present, triggers a GNU `make` build (`nmake` on Windows).
 * `configure` - if present, it is executed via `sh`, followed by a `make` build (`nmake` on Windows).
+* `configure.ac` or `configure.in` - if present, triggers `autoreconf`, `configure`, then `make`
+(`nmake` on Windws).
 
 You can specify a `target` in your dependency, which will be passed to `make` or `CMake`.
 

@@ -4,6 +4,7 @@ import 'package:build/build.dart';
 import 'package:build_native/src/models/models.dart';
 import 'package:build_native/src/platform_type.dart';
 import 'package:path/path.dart' as p;
+import 'autoconf.dart';
 import 'cmake.dart';
 import 'configure_script.dart';
 import 'external_builder.dart';
@@ -43,7 +44,28 @@ class DependencyView {
         return const ExternalCMakeBuilder();
       }
 
+//      cmakeFile = new File(p.join(directory.path, 'CMakeLists.txt.in'));
+//
+//      if (await cmakeFile.exists()) {
+//        log.config('Found CMakeLists.txt.in: ${cmakeFile.absolute.path}');
+//        return const ExternalCMakeBuilder();
+//      }
+
       if (platformType != PlatformType.windows) {
+        var autoconfFile = new File(p.join(directory.path, 'configure.ac'));
+
+        if (await autoconfFile.exists()) {
+          log.config('Found autoconf script: ${autoconfFile.absolute.path}');
+          return const AutoconfBuilder();
+        }
+
+        autoconfFile = new File(p.join(directory.path, 'configure.in'));
+
+        if (await autoconfFile.exists()) {
+          log.config('Found autoconf script: ${autoconfFile.absolute.path}');
+          return const AutoconfBuilder();
+        }
+
         var configureFile = new File(p.join(directory.path, 'configure'));
 
         if (await configureFile.exists()) {

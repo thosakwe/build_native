@@ -1,3 +1,8 @@
+# 0.0.9+5
+* Support `autoconf`, and check for it in `doctor`.
+* Check for `cmake`.
+* When using `libraries` from a 3rd-party dependency, pass the library's directory as an `-L` flag.
+
 # 0.0.9+4
 * Build external dependencies into a separate `third_party_build`
 dir.

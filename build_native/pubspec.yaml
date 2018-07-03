@@ -2,7 +2,7 @@ author: Tobe O <thosakwe@gmail.com>
 description: Compile native extensions with package:build, using the system compilers.
 homepage: https://github.com/thosakwe/build_native
 name: build_native
-version: 0.0.9+4
+version: 0.0.9+5
 environment:
   sdk: ">=2.0.0-dev.55 <3.0.0"
 dependencies:
