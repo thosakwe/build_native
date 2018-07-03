@@ -1,3 +1,6 @@
+# 0.0.9+7
+* Allow malformed UTF8 sequences.
+
 # 0.0.9+6
 * Patch a bug in how 3rd-party dependencies with `sources` were
 compiled.

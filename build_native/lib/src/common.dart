@@ -28,8 +28,8 @@ Future<Stream<List<int>>> execProcess(String executable, List<String> arguments,
       : process.exitCode);
 
   if (code != 0) {
-    var out = await process.stdout.transform(utf8.decoder).join();
-    var err = await process.stderr.transform(utf8.decoder).join();
+    var out = await process.stdout.transform(const Utf8Decoder(allowMalformed: true)).join();
+    var err = await process.stderr.transform(const Utf8Decoder(allowMalformed: true)).join();
     if (out.isNotEmpty) log.info(out);
     if (err.isNotEmpty) log.severe(err);
     log.severe('$exec terminated with exit code $code.');
@@ -49,13 +49,13 @@ Future expectExitCode0(String executable, List<String> arguments,
 void listenToProcess(Process process, [bool withStdout = false]) {
   if (withStdout) {
     process.stdout
-        .transform(utf8.decoder)
+        .transform(const Utf8Decoder(allowMalformed: true))
         .transform(LineSplitter())
         .listen(log.info);
   }
 
   process.stderr
-      .transform(utf8.decoder)
+      .transform(const Utf8Decoder(allowMalformed: true))
       .transform(LineSplitter())
       .listen(log.warning);
 }
@@ -97,7 +97,7 @@ Future handleProcess(Process process, String exec, BuildStep buildStep,
   var code = await process.exitCode;
 
   if (code != 0) {
-    var out = await process.stdout.transform(utf8.decoder).join();
+    var out = await process.stdout.transform(const Utf8Decoder(allowMalformed: true)).join();
     if (out.isNotEmpty) log.info(out);
     throw '$exec terminated with exit code $code.';
   } else {
