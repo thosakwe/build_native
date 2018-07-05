@@ -79,7 +79,11 @@ class WebDependencyUpdater implements DependencyUpdater {
       stream = stream.transform(gzip.decoder);
       ext = p.extension(p.basenameWithoutExtension(archiveFile.path));
     } else if (ext == '.lz' || ext == '.xz') {
-      stream = stream.transform(lzma.decoder);
+      var bytes = await stream
+          .fold<BytesBuilder>(BytesBuilder(), (bb, buf) => bb..add(buf))
+          .then((bb) => bb.takeBytes());
+      var transformed = lzma.decode(bytes);
+      stream = new Stream<List<int>>.fromIterable([transformed]);
       ext = p.extension(p.basenameWithoutExtension(archiveFile.path));
     } else if (ext == '.bz2') {
       var bytes = await stream

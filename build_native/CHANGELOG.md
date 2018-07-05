@@ -1,3 +1,6 @@
+# 0.0.9+10
+* Fix decoding of `.lz`/`.xz`.
+
 # 0.0.9+9
 * Resolve third party `link` directories against the build directory.
 
