@@ -1,3 +1,6 @@
+# 0.0.9+11
+* Cover a case where file modes in an archive are `null`.
+
 # 0.0.9+10
 * Fix decoding of `.lz`/`.xz`.
 
