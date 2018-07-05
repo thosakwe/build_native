@@ -100,7 +100,7 @@ class DependencyView {
       return [];
     } else {
       return dependency.include
-          .map((s) => new Directory(p.canonicalize(p.join(directory.path, s))))
+          .map((s) => new Directory(p.canonicalize(p.join(buildDirectory.path, s))))
           .toList();
     }
   }

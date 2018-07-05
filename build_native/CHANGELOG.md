@@ -1,3 +1,6 @@
+# 0.0.9+9
+* Resolve third party `link` directories against the build directory.
+
 # 0.0.9+8
 * Don't build shared libraries to `/dev/stdout`, but to a file instead.
 
