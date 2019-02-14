@@ -1,3 +1,7 @@
+# 0.0.11
+* Begin working on Windows support.
+* Fixes for supporting `*.g.cpp`, etc.
+
 # 0.0.9+11
 * Cover a case where file modes in an archive are `null`.
 
