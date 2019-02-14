@@ -23,13 +23,16 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
     var args = <String>[];
     var scratchSpace = await options.scratchSpace;
     var inputFile = scratchSpace.fileFor(options.inputId);
+    var outputFile = scratchSpace
+        .fileFor(options.inputId.changeExtension('.build_native.out'));
     await scratchSpace.ensureAssets([options.inputId], options.buildStep);
 
     args
       ..addAll([
+        '-fPIC',
         '-c',
         '-o',
-        '/dev/stdout',
+        outputFile.absolute.path,
         '-I',
         includePath,
       ]);
@@ -67,7 +70,8 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       ..addAll(options.compilerFlags)
       ..add(inputFile.absolute.path);
 
-    return await execProcess(compiler, args);
+    await execProcess(compiler, args).then((s) => s.drain());
+    return outputFile.openRead();
   }
 
   @override

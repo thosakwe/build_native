@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:build/build.dart';
 import 'package:build_native/src/compiler/macos.dart';
 import 'package:build_native/src/compiler/unix.dart';
+import 'package:build_native/src/compiler/windows.dart';
 import 'package:build_native/src/models/models.dart';
 import 'package:build_native/src/third_party/third_party.dart';
 import 'package:build_native/src/common.dart';
@@ -13,6 +14,7 @@ import 'package:path/path.dart' as p;
 Map<PlatformType, NativeExtensionCompiler> nativeExtensionCompilers = {
   PlatformType.macOS: MacOSNativeExtensionCompiler(),
   PlatformType.linux: UnixNativeExtensionCompiler(),
+  PlatformType.windows: WindowsNativeExtensionCompiler(),
 };
 
 abstract class NativeExtensionCompiler {

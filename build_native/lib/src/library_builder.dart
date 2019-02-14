@@ -33,7 +33,7 @@ class _LibraryBuilder implements Builder {
     var compiler = nativeExtensionCompilers[platformType];
 
     if (compiler == null) {
-      throw 'Cannot compile object files on platform `${platformType.name}` yet.';
+      throw 'Cannot compile library files on platform `${platformType.name}` yet.';
     }
 
     var config = await readConfig(asset, buildStep, platformType);
