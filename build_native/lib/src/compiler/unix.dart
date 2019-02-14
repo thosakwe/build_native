@@ -70,7 +70,7 @@ class UnixNativeExtensionCompiler implements NativeExtensionCompiler {
       ..addAll(options.compilerFlags)
       ..add(inputFile.absolute.path);
 
-    await execProcess(compiler, args);
+    await execProcess(compiler, args).then((s) => s.drain());
     return outputFile.openRead();
   }
 

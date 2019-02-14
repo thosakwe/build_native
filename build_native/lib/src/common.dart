@@ -22,7 +22,7 @@ Future<Stream<List<int>>> execProcess(String executable, List<String> arguments,
   if (workingDirectory != null) exec += ' (in $workingDirectory)';
   log.config(exec);
   var process = await Process.start(executable, arguments,
-      workingDirectory: workingDirectory);
+      workingDirectory: workingDirectory, runInShell: true);
   var code = await (withTimeout
       ? avoidHangingProcess(process, exec)
       : process.exitCode);
