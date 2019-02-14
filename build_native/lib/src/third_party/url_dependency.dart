@@ -46,8 +46,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       var checksum = hex.encode(md5.convert(bytes).bytes);
 
       if (checksum != dependency.md5) {
-        throw 'The MD5 checksum $checksum of ${archiveFile.absolute
-            .path} does not equal ${dependency.md5}.';
+        throw 'The MD5 checksum $checksum of ${archiveFile.absolute.path} does not equal ${dependency.md5}.';
       }
     }
 
@@ -56,8 +55,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       var checksum = hex.encode(sha256.convert(bytes).bytes);
 
       if (checksum != dependency.sha256) {
-        throw 'The SHA256 checksum $checksum of ${archiveFile.absolute
-            .path} does not equal ${dependency.sha256}.';
+        throw 'The SHA256 checksum $checksum of ${archiveFile.absolute.path} does not equal ${dependency.sha256}.';
       }
     }
 
@@ -66,8 +64,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       var checksum = hex.encode(sha1.convert(bytes).bytes);
 
       if (checksum != dependency.sha1) {
-        throw 'The SHA1 checksum $checksum of ${archiveFile.absolute
-            .path} does not equal ${dependency.sha1}.';
+        throw 'The SHA1 checksum $checksum of ${archiveFile.absolute.path} does not equal ${dependency.sha1}.';
       }
     }
 
@@ -152,8 +149,7 @@ class WebDependencyUpdater implements DependencyUpdater {
         var statusCode = handleFailureStatusCode(rs, dependency.webUrl);
 
         if (statusCode != 200) {
-          throw '${dependency
-              .webUrl} sent status code $statusCode; only 200 is allowed.';
+          throw '${dependency.webUrl} sent status code $statusCode; only 200 is allowed.';
         }
 
         var archiveFile = new File(p.join(

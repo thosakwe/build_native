@@ -5,9 +5,9 @@ part 'third_party.g.dart';
 
 part 'third_party.serializer.g.dart';
 
-@Serializable(autoIdAndDateFields: false)
+@serializable
 abstract class _ThirdPartyDependency {
-  @Alias('url')
+  @HasAlias('url')
   String get webUrl;
 
   String get md5;
@@ -16,7 +16,7 @@ abstract class _ThirdPartyDependency {
 
   String get sha256;
 
-  @Alias('git')
+  @HasAlias('git')
   String get gitUrl;
 
   String get commit;
@@ -31,7 +31,7 @@ abstract class _ThirdPartyDependency {
 
   String get path;
 
-  @Alias('libraries')
+  @HasAlias('libraries')
   List<String> get libPaths;
 
   List<String> get include;

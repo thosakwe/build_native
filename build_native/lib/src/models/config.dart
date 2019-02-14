@@ -7,7 +7,7 @@ part 'config.g.dart';
 
 part 'config.serializer.g.dart';
 
-@Serializable(autoIdAndDateFields: false)
+@serializable
 abstract class _BuildNativeConfig {
   List<String> get flags;
 
@@ -21,6 +21,6 @@ abstract class _BuildNativeConfig {
 
   List<String> get disallowedPlatforms;
 
-  @Alias('third_party')
+  @HasAlias('third_party')
   Map<String, ThirdPartyDependency> get thirdPartyDependencies;
 }

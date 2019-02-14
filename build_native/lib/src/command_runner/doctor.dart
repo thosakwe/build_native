@@ -90,7 +90,8 @@ class DoctorCommand extends Command {
 
     if (platformType == PlatformType.windows) {
       // TODO: Complete Windows support. Check for compilers, etc.
-      //throw new UnimplementedError('The `doctor` command does not yet completely support Windows.');
+      throw new UnimplementedError(
+          'The `doctor` command does not yet completely support Windows.');
     } else {
       // Check for `gcc`/clang
       if (platformType == PlatformType.macOS) {

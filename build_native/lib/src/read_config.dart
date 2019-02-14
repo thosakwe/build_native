@@ -24,8 +24,7 @@ Future<BuildNativeConfig> readConfig(
   var config = BuildNativeConfigSerializer.fromMap(configMap);
 
   if (config.disallowedPlatforms?.contains(platformType.name) == true) {
-    throw 'This project has explicitly disallowed building on platform "${platformType
-        .name}".';
+    throw 'This project has explicitly disallowed building on platform "${platformType.name}".';
   }
 
   // Try to find platform-specific config.

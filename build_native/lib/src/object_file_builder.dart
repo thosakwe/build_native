@@ -34,8 +34,7 @@ class ObjectFileBuilder {
     var compiler = nativeExtensionCompilers[platformType];
 
     if (compiler == null) {
-      throw 'Cannot compile object files on platform `${platformType
-          .name}` yet.';
+      throw 'Cannot compile object files on platform `${platformType.name}` yet.';
     }
 
     // Only compile platform-specific files if they apply to the current platform.

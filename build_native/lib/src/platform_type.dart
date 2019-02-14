@@ -37,8 +37,7 @@ class PlatformType {
     else if (Platform.isLinux)
       return _thisSystem = linux;
     else
-      throw 'Could not detect platform type for operating system: ${Platform
-          .operatingSystem}';
+      throw 'Could not detect platform type for operating system: ${Platform.operatingSystem}';
   }
 
   static bool isPlatformSpecific(String path) {
@@ -54,9 +53,13 @@ class PlatformType {
   }
 
   static String stripPlatformExtension(String path) {
-    var withoutCExtension = p.basenameWithoutExtension(path);
-    var remainingBasename = p.basenameWithoutExtension(withoutCExtension);
-    return p.setExtension(remainingBasename, p.extension(path));
+    return path
+        .replaceAll(RegExp(r'\.cc?$'), '')
+        .replaceAll(RegExp(r'\.cpp$'), '')
+        .replaceAll(RegExp(r'\.(windows|linux|macos)$'), '');
+    // var withoutCExtension = p.basenameWithoutExtension(path);
+    // var remainingBasename = p.basenameWithoutExtension(withoutCExtension);
+    // return p.setExtension(remainingBasename, p.extension(path));
   }
 
   bool canCompile(String path) {

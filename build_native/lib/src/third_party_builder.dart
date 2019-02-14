@@ -62,8 +62,7 @@ class _ThirdPartyBuilder implements Builder {
         var compiler = nativeExtensionCompilers[platformType];
 
         if (compiler == null) {
-          throw 'Cannot compile external libraries on platform `${platformType
-              .name}` yet.';
+          throw 'Cannot compile external libraries on platform `${platformType.name}` yet.';
         }
 
         log.info('Compiling static library `${dep.name}`...');
