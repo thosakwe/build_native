@@ -36,7 +36,8 @@ class WebDependencyUpdater implements DependencyUpdater {
     }
 
     var file = archiveNameFile(directory);
-    var archiveFilename = await file.openRead().transform(utf8.decoder).join();
+    var archiveFilename =
+        await file.openRead().cast<List<int>>().transform(utf8.decoder).join();
     var archiveFile = new File(
         p.join(localBuildNativeDirectory(directory).path, archiveFilename));
 
@@ -68,7 +69,7 @@ class WebDependencyUpdater implements DependencyUpdater {
       }
     }
 
-    var stream = archiveFile.openRead();
+    var stream = archiveFile.openRead().cast<List<int>>();
     var ext = p.extension(archiveFile.path);
     Archive archive;
 
@@ -164,8 +165,11 @@ class WebDependencyUpdater implements DependencyUpdater {
         await rs.pipe(archiveFile.openWrite());
         return true;
       } else {
-        var archiveFilename =
-            await file.openRead().transform(utf8.decoder).join();
+        var archiveFilename = await file
+            .openRead()
+            .cast<List<int>>()
+            .transform(utf8.decoder)
+            .join();
         var archiveFile = new File(
             p.join(localBuildNativeDirectory(directory).path, archiveFilename));
 
