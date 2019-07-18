@@ -162,7 +162,7 @@ class WebDependencyUpdater implements DependencyUpdater {
         file.writeAsString(p.basename(archiveFile.path));
 
         await archiveFile.create(recursive: true);
-        await rs.pipe(archiveFile.openWrite());
+        await rs.cast<List<int>>().pipe(archiveFile.openWrite());
         return true;
       } else {
         var archiveFilename = await file
@@ -194,7 +194,7 @@ class WebDependencyUpdater implements DependencyUpdater {
         //
         // Let's overwrite the current file, and signal that it needs to be
         // extracted again.
-        await rs.pipe(archiveFile.openWrite());
+        await rs.cast<List<int>>().pipe(archiveFile.openWrite());
         return true;
       }
     } finally {
